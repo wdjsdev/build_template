@@ -64,6 +64,7 @@ function buildConfig()
 
 	var varyingInseams = 
 					[
+						"22I",
 						"24I",
 						"26I",
 						"28I",
@@ -78,6 +79,8 @@ function buildConfig()
 
 	var waistSizes = 
 					[
+						"22W",
+						"24W",
 						"26W",
 						"28W",
 						"30W",
