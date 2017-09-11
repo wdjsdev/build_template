@@ -1,6 +1,15 @@
 
 function logCoords()
 {
+	var valid = true;
+	//add in the utilities container
+	#include "/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.js";
+
+	//file locations
+	var configFileLoc = "~/Documents/";
+	var centralConfigLoc = "/Volumes/Customization/Library/Scripts/Script Resources/Data/";
+
+
 	//logic container
 	function readConfig()
 	{
@@ -26,7 +35,7 @@ function logCoords()
 
 		//trim the parentheses from the config.toSource() return value;
 		var parenPat = /[\(\)]/g;
-		var str = "var config = " + config.toSource().replace(parenPat,"");
+		var str = "var config = " + JSON.stringify(config).replace(parenPat,"");
 
 		configFile.open("w");
 		configFile.write(str);
@@ -80,65 +89,55 @@ function logCoords()
 		{
 			templateInfo[curGarCode] = config;
 			btConfigLog.open("w");
-			btConfigLog.write("var templateInfo = " + templateInfo.toSource().replace(parenPat,""));
+			btConfigLog.write("var templateInfo = " + JSON.stringify(templateInfo).replace(parenPat,""));
 			btConfigLog.close();
 		}
 		return result;
 		
 	}
 
-
-	function coord()
-	{
-		var coords = {};
-		var layer;
-
-		if(layers[0].name == "To Be Placed")
-		{
-			layer = layers[1].layers["Prepress"];
-		}
-		else
-		{
-			layer = docRef.layers[0].layers["Prepress"];
-		}
-
-	
-		for(var a=0;a<layer.layers.length;a++)
-		{
-			var curSize = layer.layers[a].name;
-			coords[curSize] = {};
-			for(var b=0;b<layer.layers[a].groupItems.length;b++)
-			{
-				var thisPiece = layer.layers[a].groupItems[b];
-				var pieceName = thisPiece.name;
-				coords[curSize][pieceName] = [];
-				coords[curSize][pieceName][0] = (Math.floor(thisPiece.left *1000)/1000);
-				coords[curSize][pieceName][1] = (Math.floor(thisPiece.top *1000)/1000);
-			}
-				
-		}
-		return coords;
-	}
-
-	//add in the utilities container
-	#include "/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.js";
-
-	//file locations
-	var configFileLoc = "~/Documents/";
-	var centralConfigLoc = "/Volumes/Customization/Library/Scripts/Script Resources/Data/";
-
 	var docRef = app.activeDocument;
 	var layers = docRef.layers;
 	
-	var config = readConfig();
-	if(!config)return;
+	if(valid)
+	{
+		var config = readConfig();
+		if(!config)
+		{
+			valid = false;
+		}
+	}
+	if(valid)
+	{
+		var ppLay = getPPLay(layers);
+		if(!ppLay)
+		{
+			errorList.push("Failed to find the prepress layer. Please check your layer structure and try again..");
+			valid = false;
+		}
+	}
+	if(valid)
+	{
+		config.placement = coord(ppLay);
+		config.createdBy = user;
+		config.createdOn = logTime();
+	}
 
-	config.placement = coord();
-	config.createdBy = user;
-	config.createdOn = logTime();
+	
 
-	if(writeConfigFile(config))
-		alert("Successfully added the placement data to your config file. You should be ready to build some templates!!! =)");
+	if(valid)
+	{
+		if(writeConfigFile(config))
+		{
+			alert("Successfully added the placement data to your config file. You should be ready to build some templates!!! =)");
+		}
+	}
+
+	if(errorList.length > 0)
+	{
+		sendErrors(errorList);
+	}
+	return valid;
 
 }
 logCoords();

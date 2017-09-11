@@ -18,6 +18,10 @@
 
 function buildConfig()
 {
+	var valid = true;
+	//add in the utilities container
+	#include "/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.js";
+
 
 	var configFileLoc = "~/Documents/";
 	var centralConfigLoc = "/Volumes/Customization/Library/Scripts/Script Resources/Data/";
@@ -106,9 +110,6 @@ function buildConfig()
 	//sizing structure contains variable inseam sizing
 	//which changes how the data needs to be logged
 	var varyingInseamSizing = false;
-
-	//add in the utilities container
-	#include "/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.js";
 
 	var config =
 	{
@@ -447,7 +448,7 @@ function buildConfig()
 		}
 	}
 
-	if(makeDialog())
+	if(valid && makeDialog())
 	{
 		writeConfigFile(config);
 	}

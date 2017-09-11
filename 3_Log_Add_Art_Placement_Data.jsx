@@ -1,5 +1,6 @@
 function logAddArtPlacement()
 {
+	var valid = true;
 	#include "/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.js";
 	#include "/Volumes/Customization/Library/Scripts/Script Resources/Data/central_library.js";
 
@@ -16,38 +17,6 @@ function logAddArtPlacement()
 		eval("#include \"" + configFile.fsName + "\"");
 
 		return config;
-	}
-
-	function coord()
-	{
-		var coords = {};
-		var layer;
-
-		if(layers[0].name == "To Be Placed")
-		{
-			layer = layers[1].layers["Prepress"];
-		}
-		else
-		{
-			layer = docRef.layers[0].layers["Prepress"];
-		}
-
-	
-		for(var a=0;a<layer.layers.length;a++)
-		{
-			var curSize = layer.layers[a].name;
-			coords[curSize] = {};
-			for(var b=0;b<layer.layers[a].groupItems.length;b++)
-			{
-				var thisPiece = layer.layers[a].groupItems[b];
-				var pieceName = thisPiece.name;
-				coords[curSize][pieceName] = [];
-				coords[curSize][pieceName][0] = (Math.floor(thisPiece.left *1000)/1000);
-				coords[curSize][pieceName][1] = (Math.floor(thisPiece.top *1000)/1000);
-			}
-				
-		}
-		return coords;
 	}
 
 	function writeDatabaseFile()
@@ -68,51 +37,62 @@ function logAddArtPlacement()
 		cenLibFile.open("w");
 		cenLibFile.write("var prepressInfo = " + JSON.stringify(prepressInfo).replace(parenPat,""));
 		cenLibFile.close();
-		// $.writeln("var prepressInfo = " + JSON.stringify(prepressInfo).replace(parenPat,""));
-
-
-
 	}
-
-
-
-
-
-
 
 	var docRef = app.activeDocument;
 	var layers = docRef.layers;
 
-	var config = readConfig();
-	if(!config)
+	if(valid)
 	{
-		return;
+		var config = readConfig();
+		if(!config)
+		{
+			valid = false;
+		}
 	}
 
-	var aaPlacement = coord();
-
-	var garCode = config.garmentCode;
-	var garCodeUnderscore = garCode.replace("-","_");
-
-	var overwrite = true;
-	var aaData = prepressInfo[garCodeUnderscore];
-
-	if(!aaData)
+	if(valid)
 	{
-		aaData = prepressInfo[garCode];
+		var ppLay = getPPLay(layers);
+		if(!ppLay)
+		{
+			errorList.push("Failed to determine the Prepress layer. Check your layer structure.");
+			valid = false;
+		}
+	}
+	if(valid)
+	{
+		var aaPlacement = coord(ppLay);
+		var garCode = config.garmentCode;
+		var garCodeUnderscore = garCode.replace("-","_");
+		var overwrite = true;
+		var aaData = prepressInfo[garCodeUnderscore];
+
+		if(!aaData)
+		{
+			aaData = prepressInfo[garCode];
+		}
+
+		if(aaData)
+		{
+			overwrite = confirm("A database entry exists for " + garCode + ". Do you want to overwrite it?");
+		}
+
+		if(overwrite)
+		{
+			writeDatabaseFile();
+
+			alert("Successfully added " + garCode + " to database. You should be ready to run add_artwork.");
+		}
 	}
 
-	if(aaData)
+	if(errorList.length>0)
 	{
-		overwrite = confirm("A database entry exists for " + garCode + ". Do you want to overwrite it?");
+		sendErrors(errorList);
 	}
-
-	if(overwrite)
-	{
-		writeDatabaseFile();
-
-		alert("Successfully added " + garCode + " to database. You should be ready to run add_artwork.");
-	}
+	
+	return valid;
+	
 
 }
 logAddArtPlacement();

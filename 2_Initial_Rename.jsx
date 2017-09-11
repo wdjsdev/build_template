@@ -1,5 +1,12 @@
 function initialRename()
 {
+	var valid = true;
+
+	//add in the utilities container
+	#include "/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.js";
+
+
+
 	var docRef = app.activeDocument;
 	var layers = docRef.layers;
 	var srcLay,orientation;
@@ -333,15 +340,29 @@ function initialRename()
 	}
 
 	//begin function calls
-	var config = readConfig();
-	if(!config)return;
+	if(valid)
+	{
+		var config = readConfig();
+		if(!config)
+		{
+			valid = false;
+		}
+	}
+	
+	if(valid)
+	{
+		var srcLay = getSrcLay();
+		if(!srcLay)
+		{
+			valid = false;
+		}
+	}
 
-	var srcLay = getSrcLay();
-	if(!srcLay)return;
-
-	var sorted = sortPieces(srcLay.groupItems);
-
-	nameThePieces(sorted);
+	if(valid)
+	{
+		var sorted = sortPieces(srcLay.groupItems);
+		nameThePieces(sorted);
+	}
 
 	
 	
