@@ -28,6 +28,7 @@ function buildConfig()
 
 	var standardSizing = 
 						[
+							"YXXXS",
 							"YXXS",
 							"YXS",
 							"YS",
@@ -35,6 +36,8 @@ function buildConfig()
 							"YL",
 							"YXL",
 							"Y2XL",
+							"Y3XL",
+							"XXXS",
 							"XXS",
 							"XS",
 							"S",
