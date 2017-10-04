@@ -318,7 +318,11 @@ function initialRename()
 						thisPiece.moveToBeginning(newSizeLayer);
 
 						//increment or reset pieceCounter
-						if(pieceCounter < 7)
+						// if(pieceCounter < 7)
+						// {
+						// 	pieceCounter++;
+						// }
+						if(pieceCounter < config["pieces"].length -1)
 						{
 							pieceCounter++;
 						}
