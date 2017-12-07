@@ -3,7 +3,7 @@ function initialRename()
 	var valid = true;
 
 	//add in the utilities container
-	#include "/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.js";
+	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.jsxbin\"");
 
 
 
