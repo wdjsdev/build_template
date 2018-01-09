@@ -46,6 +46,10 @@ function container()
 		else
 		{
 			config = templateInfo[code];
+			if(!config.garmentCode)
+			{
+				config.garmentCode = code;
+			}
 		}
 
 		return config;
