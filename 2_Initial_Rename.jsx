@@ -279,6 +279,8 @@ function initialRename()
 			garLay.locked = false;
 			garLay.visible = true;
 			var prepress = garLay.layers["Prepress"];
+			prepress.locked = false;
+			prepress.visible = true;
 			for(var a=0;a<sorted.length;a++)
 			{
 				var thisArray = sorted[a];
@@ -337,7 +339,7 @@ function initialRename()
 		}
 		catch(e)
 		{
-			alert("failed while naming the pieces");
+			alert("failed while naming the pieces\nSystem Error message = " + e);
 			valid = false;
 			return;
 		}
