@@ -18,6 +18,8 @@ Progress:
 function container()
 {
 
+	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.jsxbin\"");
+
 	/*****************************************************************************/
 
 	///////Begin/////////
@@ -332,9 +334,6 @@ function container()
 		var localValid = true;
 		try
 		{
-			// var garLay = layers[1];
-			garLay.locked = false;
-			garLay.visible = true;
 			var prepress = garLay.layers["Prepress"];
 			for(var a=0;a<sorted.length;a++)
 			{
@@ -505,13 +504,6 @@ function container()
 		return localValid;
 	}
 
-	function getCode(layer)
-	{
-		var layName = layer.name;
-		var pat = /(.*)([-_][\d]{3,}([-_][a-z])?)/i;
-
-		return layName.match(pat)[1];
-	}
 
 	////////End//////////
 	///Logic Container///
@@ -545,7 +537,7 @@ function container()
 	//important layer variables
 	var tbp,garLay,ppLay,infoLay,artLay,mockLay,srcLay;
 
-	var code = getCode(layers[1]);
+	var code = getCode(layers[1].name);
 
 	//get the config data from the build template library
 	var config = readConfig(code);
@@ -557,6 +549,7 @@ function container()
 
 	if(valid)
 	{
+		unlockDoc(docRef);
 		srcLay = getSrcLay();
 		valid = setupLayers();
 	}
@@ -610,6 +603,7 @@ function container()
 			valid = false;
 			errorList.push("Something went wrong during cleanup.");
 		}
+		properTemplateSetup(docRef);
 	}
 
 
