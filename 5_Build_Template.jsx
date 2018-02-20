@@ -447,6 +447,7 @@ function container()
 			for(var bef=0;bef<edgeGroup.length;bef++)
 			{
 				edgeGroup[bef].zOrder(ZOrderMethod.BRINGTOFRONT);
+				edgeGroup[bef].locked = true;
 			}
 		}
 	}
