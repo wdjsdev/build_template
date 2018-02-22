@@ -401,7 +401,6 @@ function container()
 		{
 			var curLay;
 			var curSize;
-			var mockLay = docRef.layers[1].layers["Mockup"];
 			for(var a=0;a<layers.length;a++)
 			{
 				curLay = layers[a];
@@ -412,10 +411,13 @@ function container()
 				{
 					curPiece = curLay.groupItems[b];
 					coords = config.placement[curSize][curPiece.name];
-					if(curPiece.name.indexOf("Outside Cowl")>-1 || curPiece.name.indexOf("Outside Yoke") > -1)
-					{
-						curPiece.rotate(180);
-					}
+					
+					//the below is deprecdated in favor of using the special_instructions database
+					//to determine specific rotation for specific pieces.
+					// if(curPiece.name.indexOf("Outside Cowl")>-1 || curPiece.name.indexOf("Outside Yoke") > -1)
+					// {
+					// 	curPiece.rotate(180);
+					// }
 					curPiece.left = coords[0];
 					curPiece.top = coords[1];
 				}
@@ -429,7 +431,7 @@ function container()
 		return localValid;
 	}
 
-	function bringEdgesForward(mockLay)
+	function bringEdgesForward()
 	{
 		var edgeGroup = [];
 
@@ -455,6 +457,13 @@ function container()
 	function createArtLayers()
 	{
 		var localValid = true;
+
+		//remove any existing artwork layers
+		while(artLay.layers.length)
+		{
+			artLay.layers[0].remove();
+		}
+
 		try
 		{
 			var reversed = config.artLayers.reverse();
@@ -494,8 +503,6 @@ function container()
 
 			layers["To Be Placed"].remove();
 			garLay.name = code + "_" + styleNum;
-			ppLay.visible = false;
-			infoLay.locked = true;
 
 		}
 		catch(e)
@@ -505,6 +512,13 @@ function container()
 		return localValid;
 	}
 
+	function clearOutPrepressLayer()
+	{
+		while(ppLay.layers.length)
+		{
+			ppLay.layers[0].remove();
+		}
+	}
 
 	////////End//////////
 	///Logic Container///
@@ -557,6 +571,11 @@ function container()
 
 	if(valid)
 	{
+		clearOutPrepressLayer();
+	}
+
+	if(valid)
+	{
 		var sorted = sortPieces(tbp.groupItems);
 		if(!sorted)
 		{
@@ -594,7 +613,7 @@ function container()
 
 	if(valid)
 	{
-		bringEdgesForward(mockLay);
+		bringEdgesForward();
 	}
 
 	if(valid)
