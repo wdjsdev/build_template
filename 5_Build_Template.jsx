@@ -467,11 +467,17 @@ function container()
 		try
 		{
 			var reversed = config.artLayers.reverse();
-			for each(lay in reversed)
-			{
-				var newLay = artLay.layers.add();
-				newLay.name = lay;
+			var newLay;
+			// for each(lay in reversed)
+			// {
+			// 	var newLay = artLay.layers.add();
+			// 	newLay.name = lay;
 
+			// }
+			for(var x=0,len=reversed.length;x<len;x++)
+			{
+				newLay = artLay.layers.add();
+				newLay.name = reversed[x];
 			}
 		}
 		catch(e)
