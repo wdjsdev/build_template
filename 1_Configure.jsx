@@ -104,6 +104,7 @@ function buildConfig()
 						"42W",
 						"44W"
 					]
+	
 	var possibleArtLocs = ["Front Logo", "Front Number", "Player Name", "Back Number", "Right Sleeve", "Left Sleeve", "Sponsor Logo", "Locker Tag", "Right Cowl", "Left Cowl", "Left Leg", "Right Leg", "Right Hood", "Left Hood", "Front Pocket", "Collar Art", "Right Front Leg", "Left Front Leg", "Additional Artwork"];
 
 	var possibleSizing = ["Regular Sizing", "Pants Sizing", "Varying Inseams"];
@@ -154,7 +155,14 @@ function buildConfig()
 		return result;
 	}
 
-	function validate(gc,orient,names,sizes,artLocs,artLocInput,selectedWaistSizes)
+	//validation arguments
+	//(	garment code [string], 
+	//	orientation [radio button],
+	//	piece names [string],
+	//	garment sizes [group object with child strings],
+	//	artwork locations [group object with child checkboxes],
+	//	user entered artwork locations [string],)
+	function validate(gc,orient,names,sizes,artLocs,artLocInput)
 	{
 
 		var valid = true;
@@ -226,26 +234,40 @@ function buildConfig()
 			var sizeArray = [];
 			var waistSizeArray = [];
 
-			for(var s=0;s<sizes.children.length;s++)
+			if(sizes.variable.value)
 			{
-				var thisChild = sizes.children[s];
-				if(thisChild.value)
-				{
-					sizeArray.push(thisChild.text.toUpperCase());
-				}
+				var inseamSizes = sizes.inseamSizes.text.split(",");
+				var waistSizes = sizes.waistSizes.text.split(",");
+
+				populateArrays(inseamSizes,sizeArray);
+				populateArrays(waistSizes,waistSizeArray);
+			}
+			else
+			{
+				populateArrays(sizes.sizes.text.split(","),sizeArray);
 			}
 
-			if(selectedWaistSizes)
-			{
-				for(var w=0;w<selectedWaistSizes.children.length;w++)
-				{
-					var thisChild = selectedWaistSizes.children[w];
-					if(thisChild.value)
-					{
-						waistSizeArray.push(thisChild.text.toUpperCase());
-					}
-				}
-			}
+
+			// for(var s=0;s<sizes.children.length;s++)
+			// {
+			// 	var thisChild = sizes.children[s];
+			// 	if(thisChild.value)
+			// 	{
+			// 		sizeArray.push(thisChild.text.toUpperCase());
+			// 	}
+			// }
+
+			// if(selectedWaistSizes)
+			// {
+			// 	for(var w=0;w<selectedWaistSizes.children.length;w++)
+			// 	{
+			// 		var thisChild = selectedWaistSizes.children[w];
+			// 		if(thisChild.value)
+			// 		{
+			// 			waistSizeArray.push(thisChild.text.toUpperCase());
+			// 		}
+			// 	}
+			// }
 
 			//make sure there's at least one size
 			if(sizeArray.length == 0)
@@ -319,6 +341,19 @@ function buildConfig()
 		}
 	}
 
+	function populateArrays(fromArr, toArr)
+	{
+		for(var x=0,len=fromArr.length;x<len;x++)
+		{
+			if(fromArr[x] === "" || /^\s*$/.test(fromArr[x]))
+			{
+				continue;
+			}
+			fromArr[x] = fromArr[x].replace(/^\s*|\s*$/g,"");
+			toArr.push(fromArr[x].toUpperCase());
+		}
+	}
+
 	/* beautify ignore:start */
 	function makeDialog()
 	{
@@ -352,43 +387,69 @@ function buildConfig()
 				var pngInput = pieceNameGroup.add("edittext", undefined, "Front, Back, Right Sleeve, Left Sleeve, Collar");
 					pngInput.characters = 100;
 
-			//group for selection of sizing structure
-			var selectSizeStructureGroup = w.add("panel");
-				var sssgTxt = selectSizeStructureGroup.add("statictext", undefined, "Select the appropriate sizing format.");
-				makeAssets(selectSizeStructureGroup, possibleSizing,"radiobutton");
-				var sizeBtn = selectSizeStructureGroup.add("button", undefined, "Submit");
-					sizeBtn.onClick = function()
-					{
-						deleteExistingChildren(sizeCheckboxGroup);
-						deleteExistingChildren(sizeCheckboxGroup2);
-						if(selectSizeStructureGroup.children[1].value)
-						{
-							makeAssets(sizeCheckboxGroup, standardSizing, "checkbox");
-							varyingInseamSizing = false;
-							w.layout.layout(true);
-						}
-						else if(selectSizeStructureGroup.children[2].value)
-						{
-							makeAssets(sizeCheckboxGroup,pantsSizing,"checkbox");
-							varyingInseamSizing = false;
-							w.layout.layout(true);
-						}
-						else if(selectSizeStructureGroup.children[3].value)
-						{
-							makeAssets(sizeCheckboxGroup,varyingInseams,"checkbox");
-							makeAssets(sizeCheckboxGroup2, waistSizes,"checkbox");
-							varyingInseamSizing = true;
-							w.layout.layout(true);
-						}
-					}
 
-			//group for selection of available sizes
-			var sizeGroup = w.add("panel");
-				sizeGroup.orientation = "column";
-				var sgTxt = sizeGroup.add("statictext", undefined, "Select the sizes that are available for this garment.");
-				//a group to hold the checkboxes
-				var sizeCheckboxGroup = sizeGroup.add("group");
-				var sizeCheckboxGroup2 = sizeGroup.add("group");
+			//group to hold sizing inputs
+			var sizeInputGroup = w.add("panel");
+				sizeInputGroup.orientation = "column";
+				var sigVariableChoice = sizeInputGroup.variable = sizeInputGroup.add("checkbox",undefined,"Variable Inseam Sizing");
+				var sigTxt = sizeInputGroup.add("statictext",undefined,"Enter the sizes necessary for this garment, separated by commas.");
+				var sigInput = sizeInputGroup.sizes = sizeInputGroup.add("editText",undefined,"Enter the sizes in the following format: XS,S,M,L,XL")
+				var sigWaistInput = sizeInputGroup.waistSizes = sizeInputGroup.add("editText", undefined, "Enter waist Sizes in the following format: 30W,32W,34W");
+					sigWaistInput.enabled = false;
+				var sigInseamInput = sizeInputGroup.inseamSizes = sizeInputGroup.add("editText", undefined, "Enter inseam sizes in the following format: 26I,28I,30I");
+					sigInseamInput.enabled = false;
+					sigInput.characters = 100;
+					sigWaistInput.characters = 100;
+					sigInseamInput.characters = 100;
+
+				sigVariableChoice.onClick = function()
+				{
+					sigInput.enabled = !sigInput.enabled;
+					sigWaistInput.enabled = !sigWaistInput.enabled;
+					sigInseamInput.enabled = !sigInseamInput.enabled;
+				}
+
+			//
+			//deprecated in favor of a more universal solution
+			//giving users the ability to simply type out the sizes necessary
+			//
+				// //group for selection of sizing structure
+				// var selectSizeStructureGroup = w.add("panel");
+				// 	var sssgTxt = selectSizeStructureGroup.add("statictext", undefined, "Select the appropriate sizing format.");
+				// 	makeAssets(selectSizeStructureGroup, possibleSizing,"radiobutton");
+				// 	var sizeBtn = selectSizeStructureGroup.add("button", undefined, "Submit");
+				// 		sizeBtn.onClick = function()
+				// 		{
+				// 			deleteExistingChildren(sizeCheckboxGroup);
+				// 			deleteExistingChildren(sizeCheckboxGroup2);
+				// 			if(selectSizeStructureGroup.children[1].value)
+				// 			{
+				// 				makeAssets(sizeCheckboxGroup, standardSizing, "checkbox");
+				// 				varyingInseamSizing = false;
+				// 				w.layout.layout(true);
+				// 			}
+				// 			else if(selectSizeStructureGroup.children[2].value)
+				// 			{
+				// 				makeAssets(sizeCheckboxGroup,pantsSizing,"checkbox");
+				// 				varyingInseamSizing = false;
+				// 				w.layout.layout(true);
+				// 			}
+				// 			else if(selectSizeStructureGroup.children[3].value)
+				// 			{
+				// 				makeAssets(sizeCheckboxGroup,varyingInseams,"checkbox");
+				// 				makeAssets(sizeCheckboxGroup2, waistSizes,"checkbox");
+				// 				varyingInseamSizing = true;
+				// 				w.layout.layout(true);
+				// 			}
+				// 		}
+
+				// //group for selection of available sizes
+				// var sizeGroup = w.add("panel");
+				// 	sizeGroup.orientation = "column";
+				// 	var sgTxt = sizeGroup.add("statictext", undefined, "Select the sizes that are available for this garment.");
+				// 	//a group to hold the checkboxes
+				// 	var sizeCheckboxGroup = sizeGroup.add("group");
+				// 	var sizeCheckboxGroup2 = sizeGroup.add("group");
 				
 
 			//group for selection of necessary art layers
@@ -406,7 +467,7 @@ function buildConfig()
 				var submit = btnGroup.add("button", undefined, "Submit");
 					submit.onClick = function()
 					{
-						if(validate(gcInput,oriRadioGroup,pngInput,sizeCheckboxGroup,artLocCheckboxGroup,artLocInput,sizeCheckboxGroup2))
+						if(validate(gcInput,oriRadioGroup,pngInput,sizeInputGroup,artLocCheckboxGroup,artLocInput))
 						{
 							dialogSuccess = true;
 							w.close();
