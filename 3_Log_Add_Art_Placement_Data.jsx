@@ -19,6 +19,40 @@ function logAddArtPlacement()
 		return config;
 	}
 
+	function getMockupSize()
+	{
+		var result;
+		var sizes = [];
+
+		for(var x=0,len=ppLay.layers.length;x<len;x++)
+		{
+			sizes.push(ppLay.layers[x].name);
+		}
+
+		var w = new Window("dialog","Choose Mockup Size");
+			var txt = UI.static(w,"Select the proper mockup size.");
+			var ddList = UI.dropdown(w,sizes);
+			var btnGroup = UI.group(w);
+				var cancel = UI.button(btnGroup,"Cancel",function()
+				{
+					w.close();
+				})
+				var submit = UI.button(btnGroup,"Submit", function()
+				{
+					if(ddList.selection)
+					{
+						result = ddList.selection.text;
+						w.close();
+					}
+					else
+					{
+						alert("Make a selection");
+					}
+				})
+		w.show();
+		return result;
+	}
+
 	function writeDatabaseFile()
 	{
 		var cenLibFile = new File("/Volumes/Customization/Library/Scripts/Script Resources/Data/central_library.js");
@@ -26,7 +60,13 @@ function logAddArtPlacement()
 
 		var parenPat = /[\(\)]/g;
 
-		thisGarInfo.mockupSize = prompt("Enter the mockup size.","XL").toUpperCase();
+		// thisGarInfo.mockupSize = prompt("Enter the mockup size.","XL").toUpperCase();
+		thisGarInfo.mockupSize = getMockupSize();
+		if(!thisGarInfo.mockupSize)
+		{
+			errorList.push("Failed to get the proper mockup size.");
+			return;
+		}
 		thisGarInfo.scaleFrontLogo = confirm("Should the front logo follow .5\" scaling rule?");
 		thisGarInfo.placement = aaPlacement;
 		thisGarInfo.createdOn = logTime();
