@@ -167,7 +167,7 @@ function buildConfig()
 		//validate garment code//
 		/////////////////////////
 			//valid garment code regex
-			var gcPat = /^[A-Z]{2}[-_][0-9]{3,4}([A-Z]*)?$/;
+			var gcPat = /^[A-Z]{2}[-_][0-9]{3,5}([A-Z]*)?$/;
 
 			//set gc to uppercase
 			gc = gc.text.toUpperCase();
