@@ -26,59 +26,6 @@ function buildConfig()
 	var configFileLoc = "~/Documents/";
 	var centralConfigLoc = "/Volumes/Customization/Library/Scripts/Script Resources/Data/";
 
-	var standardSizing = 
-						[
-							"YXXXS",
-							"YXXS",
-							"YXS",
-							"YS",
-							"YM",
-							"YL",
-							"YXL",
-							"Y2XL",
-							"Y3XL",
-							"XXXS",
-							"XXS",
-							"XS",
-							"S",
-							"M",
-							"L",
-							"XL",
-							"2XL",
-							"3XL",
-							"4XL",
-							"5XL",
-							"XS-S",
-							"S-M",
-							"M-L",
-							"L-XL",
-							"XL-2XL",
-							"Giant Freaking Hat"
-						];
-
-	var pantsSizing = 
-					[
-						"16x14",
-						"18x15",
-						"20x16",
-						"22x17",
-						"22x26",
-						"24x18",
-						"24x26",
-						"26x19",
-						"26x28",
-						"28x20",
-						"28x28",
-						"30x21",
-						"30x28",
-						"32x22",
-						"34x23",
-						"36x24",
-						"38x24",
-						"40x24",
-						"42x24",
-						"44x24"
-					];
 
 	var varyingInseams = 
 					[
@@ -114,6 +61,13 @@ function buildConfig()
 
 	var possibleSizing = ["Regular Sizing", "Pants Sizing", "Varying Inseams"];
 
+	var exampleSizing = {
+		"Regular Sizing" : "XS,S,M,L,XL,2XL,3XL,4XL,5XL",
+		"Pants Sizing" : "24x26,26x19,26x28,28x20,28x28,30x21,30x28",
+		"Varying Inseams" : "22I,24I,26I,28I,30I,32I,34I",
+		"Waist Sizing" : "26W,28W,30W,32W,34W,36W"
+	}
+
 	//boolean variable to keep track of whether the
 	//user input a new/custom art location. these will need to be
 	//attended to because the add artwork script/central library 
@@ -136,13 +90,17 @@ function buildConfig()
 	}
 
 	//make an asset (checkbox or radio button etc) for each item in the src array
-	function makeAssets(group,src,assetType)
+	function makeAssets(group,src,assetType,func)
 	{
 		var result = [];
 		for(var cb=0;cb<src.length;cb++)
 		{
 			var name = src[cb];
 			result[cb] = group.add(assetType, undefined, name);
+			if(func)
+			{
+				result[cb].onClick = func;
+			}
 		}
 		return result;
 	}
@@ -360,52 +318,45 @@ function buildConfig()
 
 			//group for selection of sizing structure
 			var selectSizeStructureGroup = w.add("panel");
+				selectSizeStructureGroup.orientation = "row";
 				var sssgTxt = selectSizeStructureGroup.add("statictext", undefined, "Select the appropriate sizing format.");
-				makeAssets(selectSizeStructureGroup, possibleSizing,"radiobutton");
-				var sizeBtn = selectSizeStructureGroup.add("button", undefined, "Submit");
-					sizeBtn.onClick = function()
-					{
-						deleteExistingChildren(sizeCheckboxGroup);
-						deleteExistingChildren(sizeCheckboxGroup2);
-						if(selectSizeStructureGroup.children[1].value)
-						{
-							makeAssets(sizeCheckboxGroup, standardSizing, "checkbox");
-							varyingInseamSizing = false;
-							w.layout.layout(true);
-						}
-						else if(selectSizeStructureGroup.children[2].value)
-						{
-							makeAssets(sizeCheckboxGroup,pantsSizing,"checkbox");
-							varyingInseamSizing = false;
-							w.layout.layout(true);
-						}
-						else if(selectSizeStructureGroup.children[3].value)
-						{
-							makeAssets(sizeCheckboxGroup,varyingInseams,"checkbox");
-							makeAssets(sizeCheckboxGroup2, waistSizes,"checkbox");
-							varyingInseamSizing = true;
-							w.layout.layout(true);
-						}
-					}
 
-			//group for selection of available sizes
+				makeAssets(selectSizeStructureGroup, possibleSizing,"radiobutton",function()
+					{
+						sgInput.text = exampleSizing[this.text];
+						if(this.text === "Varying Inseams")
+						{
+							varyingInseamSizing = true;
+							sgWaistInput.enabled = true;
+						}
+						else
+						{
+							varyingInseamSizing = false;
+							sgWaistInput.enabled = false;
+						}
+					});
+
+
+			//group for input of available sizes
 			var sizeGroup = w.add("panel");
 				sizeGroup.orientation = "column";
-				var sgTxt = sizeGroup.add("statictext", undefined, "Select the sizes that are available for this garment.");
-				//a group to hold the checkboxes
-				var sizeCheckboxGroup = sizeGroup.add("group");
-				var sizeCheckboxGroup2 = sizeGroup.add("group");
+				var sgTxt = sizeGroup.add("statictext", undefined, "Enter the sizes [in order] needed for this garment.");
+				var sgTxt2 = sizeGroup.add("statictext", undefined, "Separate each value by a comma.");
+				var sgInput = UI.edit(sizeGroup,"S,M,L,XL,SM-MD,30x32,30Ix32W",100);
+				var sgWaistTxt = sizeGroup.add("statictext", undefined, "Enter the waist sizes [in order] needed for this garment.");
+				var sgWaistTxt2 = sizeGroup.add("statictext", undefined, "Separate each value by a comma.");
+				var sgWaistInput = UI.edit(sizeGroup,exampleSizing["Waist Sizing"],100);
+					sgWaistInput.enabled = false;
+
 				
 
 			//group for selection of necessary art layers
 			var artLocGroup = w.add("panel");
 				artLocGroup.orientation = "column";
-				var algTxt = artLocGroup.add("statictext", undefined, "Select the artwork layers you need.");
-				var artLocCheckboxGroup = artLocGroup.add("group");
-					artLocCheckboxGroup.orientation = "column";
-					makeAssets(artLocCheckboxGroup,possibleArtLocs, "checkbox");
-				var artLocInputTxt = artLocGroup.add("statictext", undefined, "But wait! The art layer I need doesn't have a checkbox!");
-				var artLocInput = artLocGroup.add("edittext", undefined, "No worries. Enter any additional layers you need here, separated by a comma:");
+				var artLocInputTxt = UI.static(artLocGroup,"Enter the artwork locations needed for this garment.");
+				var artLocInputTxt2 = UI.static(artLocGroup,"Separate each value by a comma.");
+				// var artLocInput = artLocGroup.add("edittext", undefined, "Front Logo, Front Number, Player Name, Back Number");
+				var artLocInput = UI.edit(artLocGroup,"Front Logo, Front Number, Player Name, Back Number",100);
 
 			//group for buttons
 			var btnGroup = w.add("group");
