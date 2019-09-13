@@ -27,52 +27,36 @@ function buildConfig()
 	var centralConfigLoc = "/Volumes/Customization/Library/Scripts/Script Resources/Data/";
 
 
-	var varyingInseams = 
-					[
-						"22I",
-						"24I",
-						"26I",
-						"28I",
-						"30I",
-						"32I",
-						"34I",
-						"36I",
-						"38I",
-						"40I",
-						"42I"
-					]
 
-	var waistSizes = 
-					[
-						"22W",
-						"24W",
-						"26W",
-						"28W",
-						"30W",
-						"32W",
-						"34W",
-						"36W",
-						"38W",
-						"40W",
-						"42W",
-						"44W"
-					]
-	var possibleArtLocs = ["Front Logo", "Front Number", "Player Name", "Back Number", "Right Sleeve", "Left Sleeve", "Sponsor Logo", "Locker Tag", "Right Cowl", "Left Cowl", "Left Leg", "Right Leg", "Right Hood", "Left Hood", "Front Pocket", "Collar Art", "Right Front Leg", "Left Front Leg", "Additional Artwork"];
 
-	var possibleSizing = ["Regular Sizing", "Pants Sizing", "Varying Inseams"];
 
-	var exampleSizing = {
-		"Regular Sizing" : "XS,S,M,L,XL,2XL,3XL,4XL,5XL",
-		"Pants Sizing" : "24x26,26x19,26x28,28x20,28x28,30x21,30x28",
-		"Varying Inseams" : "22I,24I,26I,28I,30I,32I,34I",
-		"Waist Sizing" : "26W,28W,30W,32W,34W,36W"
+	//global defaults
+	//used for initial default file creation
+	//and resetting defaults back to global defaults
+	//if personal defaults go haywire.
+
+	var defaultFiles = 
+	{
+		"sizing":File(documentsPath + "build_template_defaults/default_sizes.js"),
+		"pieceNames":File(documentsPath + "build_template_defaults/piece_names.js"),
+		"artLocations":File(documentsPath + "build_template_defaults/art_locations.js")
 	}
 
-	//boolean variable to keep track of whether the
-	//user input a new/custom art location. these will need to be
-	//attended to because the add artwork script/central library 
-	//may need to be updated to accomodate the new art location.
-	var newArtLocs = false;
+	//piece names
+	var pieceNameOverflowDefaults = ["Left Leg Panel","Right Leg Panel","Fly","Garage"];
+	var pieceNameInUseDefaults = ["Front","Back","Left Sleeve","Right Sleeve","Collar"];
+	var defaultLocsFile = File(documentsPath + "build_template_default_locations.js");
+
+	//sizes
+	var sizeOverflowDefaults = ["XXXS","XXS","4XL","5XL","24x26","26x19","26x28","28x20","28x28","30x21","30x28","22I","24I","26I","28I","30I","32I","34I","26W","28W","30W","32W","34W","36W"];
+	var sizeInUseDefaults = ["XS","S","M","L","XL","2XL","3XL"];
+	
+	//artwork locations
+	var locationOverflowDefaults = ["Right Cowl", "Left Cowl", "Left Leg", "Right Leg", "Right Hood", "Left Hood", "Front Pocket", "Collar Art", "Right Front Leg", "Left Front Leg"];
+	var locationsInUseDefaults = ["Front Logo", "Front Number", "Player Name", "Back Number", "Right Sleeve", "Left Sleeve", "Sponsor Logo", "Locker Tag","Additional Artwork"];
+
+
+	
 
 	//boolean variable to keep track of whether the
 	//sizing structure contains variable inseam sizing
@@ -87,6 +71,19 @@ function buildConfig()
 		"sizes":[],
 		"artLayers":[],
 		"newArtLayers":false
+	}
+
+	var sizingStructures = ["Regular Sizing", "Pants Sizing", "Varying Inseams"];
+
+
+
+	function writeDefaultFile(fileName,inUse,overflow)
+	{
+		var newString = "";
+		if(resetGlobalDefaults)
+		{
+
+		}
 	}
 
 	//make an asset (checkbox or radio button etc) for each item in the src array
@@ -321,7 +318,7 @@ function buildConfig()
 				selectSizeStructureGroup.orientation = "row";
 				var sssgTxt = selectSizeStructureGroup.add("statictext", undefined, "Select the appropriate sizing format.");
 
-				makeAssets(selectSizeStructureGroup, possibleSizing,"radiobutton",function()
+				makeAssets(selectSizeStructureGroup, sizingStructures,"radiobutton",function()
 					{
 						sgInput.text = exampleSizing[this.text];
 						if(this.text === "Varying Inseams")
