@@ -19,8 +19,15 @@
 function buildConfig()
 {
 	var valid = true;
-	//add in the utilities container
-	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.jsxbin\"");
+
+	// //Production Utilities
+	// eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.jsxbin\"");
+	// eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Batch_Framework.jsxbin\"");
+	
+	//Dev Utilities
+	eval("#include \"/Volumes/Macintosh HD/Users/will.dowling/Desktop/automation/utilities/Utilities_Container.js\"");
+	eval("#include \"/Volumes/Macintosh HD/Users/will.dowling/Desktop/automation/utilities/Batch_Framework.js\"");
+
 
 
 	/*****************************************************************************/
@@ -68,70 +75,6 @@ function buildConfig()
 
 
 
-
-
-	var configFileLoc = "~/Documents/";
-	var centralConfigLoc = "/Volumes/Customization/Library/Scripts/Script Resources/Data/";
-
-
-
-
-
-	//global defaults
-	//used for initial default file creation
-	//and resetting defaults back to global defaults
-	//if personal defaults go haywire.
-
-	var defaultFiles = 
-	{
-		"sizing":File(documentsPath + "build_template_defaults/default_sizes.js"),
-		"pieceNames":File(documentsPath + "build_template_defaults/piece_names.js"),
-		"artLocations":File(documentsPath + "build_template_defaults/art_locations.js")
-	}
-
-	//piece names
-	var pieceNameOverflowDefaults = ["Left Leg Panel","Right Leg Panel","Fly","Garage"];
-	var pieceNameInUseDefaults = ["Front","Back","Left Sleeve","Right Sleeve","Collar"];
-	var defaultLocsFile = File(documentsPath + "build_template_default_locations.js");
-
-	//sizes
-	var sizeOverflowDefaults = ["XXXS","XXS","4XL","5XL","24x26","26x19","26x28","28x20","28x28","30x21","30x28","22I","24I","26I","28I","30I","32I","34I","26W","28W","30W","32W","34W","36W"];
-	var sizeInUseDefaults = ["XS","S","M","L","XL","2XL","3XL"];
-	
-	//artwork locations
-	var locationOverflowDefaults = ["Right Cowl", "Left Cowl", "Left Leg", "Right Leg", "Right Hood", "Left Hood", "Front Pocket", "Collar Art", "Right Front Leg", "Left Front Leg"];
-	var locationsInUseDefaults = ["Front Logo", "Front Number", "Player Name", "Back Number", "Right Sleeve", "Left Sleeve", "Sponsor Logo", "Locker Tag","Additional Artwork"];
-
-
-	
-
-	//boolean variable to keep track of whether the
-	//sizing structure contains variable inseam sizing
-	//which changes how the data needs to be logged
-	var varyingInseamSizing = false;
-
-	var config =
-	{
-		"garmentCode":"",
-		"orientation":"",
-		"pieces":[],
-		"sizes":[],
-		"artLayers":[],
-		"newArtLayers":false
-	}
-
-	var sizingStructures = ["Regular Sizing", "Pants Sizing", "Varying Inseams"];
-
-
-
-	function writeDefaultFile(fileName,inUse,overflow)
-	{
-		var newString = "";
-		if(resetGlobalDefaults)
-		{
-
-		}
-	}
 
 	//make an asset (checkbox or radio button etc) for each item in the src array
 	function makeAssets(group,src,assetType,func)
@@ -327,104 +270,7 @@ function buildConfig()
 		}
 	}
 
-	/* beautify ignore:start */
-	function makeDialog()
-	{
-		var dialogSuccess = false;
-
-		var w = new Window("dialog", "Config Setup:");
-			var topTxt = w.add("statictext", undefined, "Please input the necessary information for the garment.");
-
-			//group for garment code entry:
-			// var gcGroup = w.add("group");
-			var gcGroup = w.add("panel");
-				var gcTxt = gcGroup.add("statictext", undefined, "Enter The Garment Code: ");
-				var gcInput = gcGroup.add("edittext", undefined, "eg. FD-161Y");
-					gcInput.active = true;
-					gcInput.characters = 12;
-
-			//group for orientation of CAD:
-			var oriGroup = w.add("panel");
-				var oriTxt = oriGroup.add("statictext", undefined, "Select the orientation of the CAD layout.");
-				//group for radio buttons
-				var oriRadioGroup = oriGroup.add("group");
-					var oriVert = oriRadioGroup.add("radiobutton", undefined, "Vertical");
-						oriVert.value = true;
-					var oriHorz = oriRadioGroup.add("radiobutton", undefined, "Horizontal");
-
-			//group for entry of piece names:
-			var pieceNameGroup = w.add("panel");
-				pieceNameGroup.orientation = "column";
-				var pngTxt = pieceNameGroup.add("statictext", undefined, "Enter the names of the pieces in the order they appear in the CAD.");
-				var pngTxt2 = pieceNameGroup.add("statictext", undefined, "Separate each value by a comma.");
-				var pngInput = pieceNameGroup.add("edittext", undefined, "Front, Back, Right Sleeve, Left Sleeve, Collar");
-					pngInput.characters = 100;
-
-			//group for selection of sizing structure
-			var selectSizeStructureGroup = w.add("panel");
-				selectSizeStructureGroup.orientation = "row";
-				var sssgTxt = selectSizeStructureGroup.add("statictext", undefined, "Select the appropriate sizing format.");
-
-				makeAssets(selectSizeStructureGroup, sizingStructures,"radiobutton",function()
-					{
-						sgInput.text = exampleSizing[this.text];
-						if(this.text === "Varying Inseams")
-						{
-							varyingInseamSizing = true;
-							sgWaistInput.enabled = true;
-						}
-						else
-						{
-							varyingInseamSizing = false;
-							sgWaistInput.enabled = false;
-						}
-					});
-
-
-			//group for input of available sizes
-			var sizeGroup = w.add("panel");
-				sizeGroup.orientation = "column";
-				var sgTxt = sizeGroup.add("statictext", undefined, "Enter the sizes [in order] needed for this garment.");
-				var sgTxt2 = sizeGroup.add("statictext", undefined, "Separate each value by a comma.");
-				var sgInput = UI.edit(sizeGroup,"S,M,L,XL,SM-MD,30x32,30Ix32W",100);
-				var sgWaistTxt = sizeGroup.add("statictext", undefined, "Enter the waist sizes [in order] needed for this garment.");
-				var sgWaistTxt2 = sizeGroup.add("statictext", undefined, "Separate each value by a comma.");
-				var sgWaistInput = UI.edit(sizeGroup,exampleSizing["Waist Sizing"],100);
-					sgWaistInput.enabled = false;
-
-				
-
-			//group for selection of necessary art layers
-			var artLocGroup = w.add("panel");
-				artLocGroup.orientation = "column";
-				var artLocInputTxt = UI.static(artLocGroup,"Enter the artwork locations needed for this garment.");
-				var artLocInputTxt2 = UI.static(artLocGroup,"Separate each value by a comma.");
-				// var artLocInput = artLocGroup.add("edittext", undefined, "Front Logo, Front Number, Player Name, Back Number");
-				var artLocInput = UI.edit(artLocGroup,"Front Logo, Front Number, Player Name, Back Number",100);
-
-			//group for buttons
-			var btnGroup = w.add("group");
-				var submit = btnGroup.add("button", undefined, "Submit");
-					submit.onClick = function()
-					{
-						if(validate(gcInput,oriRadioGroup,pngInput,sizeCheckboxGroup,artLocCheckboxGroup,artLocInput,sizeCheckboxGroup2))
-						{
-							dialogSuccess = true;
-							w.close();
-						}
-						else{};
-					}
-				var cancel = btnGroup.add("button", undefined, "Cancel");
-					cancel.onClick = function()
-					{
-						dialogSuccess = false;
-						w.close();
-					}
-		w.show();
-
-		return dialogSuccess;
-	}
-	/* beautify ignore:end */
+	
 
 	function writeConfigFile(config)
 	{
@@ -456,6 +302,86 @@ function buildConfig()
 			alert("Config file has remained unchanged.");
 		}
 	}
+
+
+
+
+
+//end logic container
+	
+
+
+//begin global variable stuff
+
+
+	//global defaults
+	//used for initial default file creation
+	//and resetting defaults back to global defaults
+	//if personal defaults go haywire.
+
+	var defaultFilesPath = documentsPath + "/build_template_defaults/"
+	var defaultFileFolder = Folder(defaultFilesPath);
+	if(!defaultFileFolder.exists)
+	{
+		defaultFileFolder.create();
+	}
+
+	//piece names
+	var pieceNameOverflowDefaults = ["Left Leg Panel","Right Leg Panel","Fly","Garage"];
+	var pieceNameInUseDefaults = ["Front","Back","Left Sleeve","Right Sleeve","Collar"];
+	var userDefaultPieceNamesFile = File(defaultFilesPath + "build_template_default_locations.js");
+	if(!userDefaultPieceNamesFile.exists)
+	{
+		writeDefaultFile(userDefaultPieceNamesFile,pieceNameInUseDefaults,pieceNameOverflowDefaults,"pieceName");
+	}
+	eval("#include \"" + userDefaultPieceNamesFile.fullName + "\"");
+
+	//sizes
+	var sizeOverflowDefaults = ["XXXS","XXS","4XL","5XL","24x26","26x19","26x28","28x20","28x28","30x21","30x28","22I","24I","26I","28I","30I","32I","34I"];
+	var sizeInUseDefaults = ["XS","S","M","L","XL","2XL","3XL"];
+	var userDefaultSizesFile = File(defaultFilesPath + "build_template_default_sizes.js");
+	if(!userDefaultSizesFile.exists)
+	{
+		writeDefaultFile(userDefaultSizesFile,sizeInUseDefaults,sizeOverflowDefaults,"size");
+	}
+
+	//waist sizes
+	var waistSizeOverflowDefaults = ["27W","29W","31W","33W","35W","42W","44W"];
+	var waistSizeInUseDefaults = ["26W","28W","30W","32W","34W","36W","38W","40W"];
+	var userDefaultwaistSizesFile = File(defaultFilesPath + "build_template_default_waist_sizes.js");
+	if(!userDefaultwaistSizesFile.exists)
+	{
+		writeDefaultFile(userDefaultwaistSizesFile,waistSizeInUseDefaults,waistSizeOverflowDefaults,"waistSize");
+	}
+
+	//artwork locations
+	var locationOverflowDefaults = ["Right Cowl", "Left Cowl", "Left Leg", "Right Leg", "Right Hood", "Left Hood", "Front Pocket", "Collar Art", "Right Front Leg", "Left Front Leg"];
+	var locationsInUseDefaults = ["Front Logo", "Front Number", "Player Name", "Back Number", "Right Sleeve", "Left Sleeve", "Sponsor Logo", "Locker Tag","Additional Artwork"];
+	var userDefaultLocationsFile = File(defaultFilesPath + "build_template_default_locations.js");
+	if(!userDefaultLocationsFile.exists)
+	{
+		writeDefaultFile(userDefaultLocationsFile,sizeInUseDefaults,sizeOverflowDefaults,"size");
+	}
+
+	var configFileLoc = "~/Documents/build_template_config";
+	var centralConfigLoc = "/Volumes/Customization/Library/Scripts/Script Resources/Data/";
+
+	//boolean variable to keep track of whether the
+	//sizing structure contains variable inseam sizing
+	//which changes how the data needs to be logged
+	var varyingInseamSizing = false;
+
+	var config =
+	{
+		"garmentCode":"",
+		"orientation":"",
+		"pieces":[],
+		"sizes":[],
+		"artLayers":[],
+		"newArtLayers":false
+	}
+
+	var sizingStructures = ["Regular Sizing", "Pants Sizing", "Varying Inseams"];
 
 	if(valid && makeDialog())
 	{
