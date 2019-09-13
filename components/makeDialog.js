@@ -24,9 +24,11 @@ function makeDialog()
 					var imgGroup = UI.group(h);
 						imgGroup.orientation = "row";
 						var vertImageGroup = UI.group(imgGroup);
+							vertImageGroup.orientation = "column";
 							var vertMsg = UI.static(vertImageGroup, "Vertical Orientation");
 							var vertImg = UI.image(vertImageGroup, resourcePath + "/Images/vertical_orientation.jpg");
 						var horzImageGroup = UI.group(imgGroup);
+							horzImageGroup.orientation = "column";
 							var horzMsg = UI.static(horzImageGroup, "Horizontal Orientation");
 							var horzImg = UI.image(horzImageGroup, resourcePath + "/Images/horizontal_orientation.jpg");
 					var btnGroup = UI.group(h);
@@ -41,6 +43,17 @@ function makeDialog()
 				var oriVert = oriRadioGroup.add("radiobutton", undefined, "Vertical");
 					oriVert.value = true;
 				var oriHorz = oriRadioGroup.add("radiobutton", undefined, "Horizontal");
+
+
+		////////////////////////
+		////////ATTENTION://////
+		//
+		//		temporary holdup for testing images
+		//
+		////////////////////////
+
+		w.show();
+		return;
 
 		//group for entry of piece names:
 		var pieceNameGroup = w.add("panel");
