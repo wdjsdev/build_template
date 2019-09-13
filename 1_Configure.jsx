@@ -23,6 +23,53 @@ function buildConfig()
 	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.jsxbin\"");
 
 
+	/*****************************************************************************/
+	//==============================  Components  ===============================//
+
+	if(user === "will.dowling")
+	{
+		logDest.push(File(desktopPath + "/automation/logs/bt_configure_dev_log.txt"));
+	}
+	else
+	{
+		logDest.push(File("/Volumes/Customization/Library/Scripts/Script Resources/Data/.script_logs/bt_configure_log.txt"));
+	}
+
+	var devComponents = desktopPath + "/automation/build_template/components";
+	var prodComponents = "/Volumes/Customization/Library/Scripts/Script Resources/components/build_template";
+
+	var compFiles = includeComponents(devComponents,prodComponents,false);
+	if(compFiles && compFiles.length)
+	{
+		for(var x=0,len=compFiles.length;x<len;x++)
+		{
+			try
+			{
+				eval("#include \"" + compFiles[x].fsName + "\"");
+			}
+			catch(e)
+			{
+				errorList.push("Failed to include the component: " + compFiles[x].name);
+				log.e("Failed to include the component: " + compFiles[x].name + "::System Error Message: " + e + "::System Error Line: " + e.line);
+				valid = false;
+			}
+		}
+	}
+	else
+	{
+		valid = false;
+		errorList.push("Failed to find any of the necessary components for this script to work.");
+		log.e("Failed to include any components. Exiting script.");
+	}
+
+	//=============================  /Components  ===============================//
+	/*****************************************************************************/
+
+
+
+
+
+
 	var configFileLoc = "~/Documents/";
 	var centralConfigLoc = "/Volumes/Customization/Library/Scripts/Script Resources/Data/";
 
