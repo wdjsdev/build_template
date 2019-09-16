@@ -1,9 +1,7 @@
 //file = File() object
 //inUse and overflow variables are arrays of strings
 	//eg. ["Front","Back","Collar"]
-//prefix = String() representing how to prefix the variable names
-	//eg. "pieceName" or "artLocation"
-function writeDefaultFile(file,inUse,overflow,prefix)
+function writeDefaultFile(file,inUse,overflow)
 {
 	if(!file)
 	{
@@ -14,20 +12,20 @@ function writeDefaultFile(file,inUse,overflow,prefix)
 
 	if(inUse.length)
 	{
-		newStr += "var " + prefix + "InUse = [\"" + inUse.join("\",\"") + "\"]\n\n";
+		newStr += "var inUse = [\"" + inUse.join("\",\"") + "\"];\n\n";
 	}
 	else
 	{
-		newStr += "var " + prefix + "InUse = [];\n\n";
+		newStr += "var inUse = [];\n\n";
 	}
 
 	if(overflow.length)
 	{
-		newStr += "var " + prefix + "Overflow = [\"" + overflow.join("\",\"") + "\"]\n\n";
+		newStr += "var overflow = [\"" + overflow.join("\",\"") + "\"];\n\n";
 	}
 	else
 	{
-		newStr += "var " + prefix + "Overflow = [];\n\n";
+		newStr += "var overflow = [];\n\n";
 	}
 
 	file.open("w");
