@@ -121,25 +121,7 @@ function showLists(overflow,inUse,listName)
 				});
 
 
-			//delete the selected items from whichever listbox they reside
-			var deleteArtLocBtn = UI.button(navigationBtnGroup,"Delete Selected",function()
-			{
-				if(lbOverflow.selection)
-				{
-					for(var x=0,len=lbOverflow.selection.length;x<len;x++)
-					{
-						lbOverflow.remove(lbOverflow.selection[x]);
-					}
-				}
-				if(lbInUse.selection)
-				{
-					for(var x=0,len=lbInUse.selection.length;x<len;x++)
-					{
-						lbInUse.remove(lbInUse.selection[x]);
-					}
-				}
-
-			});
+			
 
 
 
@@ -197,6 +179,27 @@ function showLists(overflow,inUse,listName)
 
 
 		var closeBtnsGroup = UI.group(sld);
+
+			//delete the selected items from whichever listbox they reside
+			var deleteArtLocBtn = UI.button(closeBtnsGroup,"Delete Selected",function()
+			{
+				if(lbOverflow.selection)
+				{
+					for(var x = lbOverflow.selection.length - 1; x>=0; x--)
+					{
+						lbOverflow.remove(lbOverflow.selection[x]);
+					}
+				}
+				if(lbInUse.selection)
+				{
+					for(var x = lbInUse.selection.length - 1; x>=0; x--)
+					{
+						lbInUse.remove(lbInUse.selection[x]);
+					}
+				}
+
+			});
+
 			var cancelBtn = UI.button(closeBtnsGroup,"Cancel",function()
 			{
 				result = undefined;
