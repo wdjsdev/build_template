@@ -14,7 +14,7 @@ function initialRename()
 	//logic container
 	function readConfig()
 	{
-		var configFile = new File("~/Documents/btconfig.js");
+		var configFile = new File("~/Documents/build_template_config/btconfig.js");
 
 		if(!configFile.exists)
 		{
@@ -281,6 +281,15 @@ function initialRename()
 			var prepress = garLay.layers["Prepress"];
 			prepress.locked = false;
 			prepress.visible = true;
+
+			//delete any layers that exist on the prepress layer
+			//to avoid having duplicated size layers if the blank
+			//template file had empty size layers in the prepress layer
+			for(var dppl = prepress.layers.length - 1; dppl>=0; dppl--)
+			{
+				prepress.layers[dppl].remove();
+			}
+			
 			for(var a=0;a<sorted.length;a++)
 			{
 				var thisArray = sorted[a];

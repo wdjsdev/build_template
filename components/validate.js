@@ -62,20 +62,21 @@ function validate(garmentCode,pieces,sizes,waistSizes,artLocs)
 		
 		txt = txt.replace(rmSpacesPat,",");
 		var newArray = txt.split(",");
-		if(label === "pieces")
-		{
-			for(var x=0,len=newArray.length;x<len;x++)
-			{
-				newArray[x] = newArray[x].toTitleCase();
-			}
-		}
-		else
+		if(label === "sizes" || label === "waistSizes")
 		{
 			for(var x=0,len=newArray.length;x<len;x++)
 			{
 				newArray[x] = newArray[x].toUpperCase();
 			}
 		}
+		else
+		{
+			for(var x=0,len=newArray.length;x<len;x++)
+			{
+				newArray[x] = newArray[x].toTitleCase();
+			}
+		}
+		
 		config[label] = newArray;
 	}
 

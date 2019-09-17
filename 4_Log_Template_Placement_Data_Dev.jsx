@@ -6,15 +6,11 @@ function logCoords()
 	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.jsxbin\"");
 
 	//file locations
-	var configFileLoc = "~/Documents/";
-	var centralConfigLoc = "/Volumes/Customization/Library/Scripts/Script Resources/Data/";
-
+	var configFile = new File(documentsPath + "build_template_config/btconfig.js");
 
 	//logic container
 	function readConfig()
 	{
-		var configFile = new File("~/Documents/btconfig.js");
-
 		if(!configFile.exists)
 		{
 			alert("No Configuration file was found. Please run the configuration script first.");
@@ -29,9 +25,8 @@ function logCoords()
 	function writeConfigFile(config)
 	{
 		var result = true;
-		var configFile = new File(configFileLoc + "/btconfig.js");
 
-		var btConfigLog = new File(centralConfigLoc + "/build_template_library.js");
+		var btConfigLog = btLibraryFile;
 
 		//trim the parentheses from the config.toSource() return value;
 		var parenPat = /[\(\)]/g;
@@ -42,8 +37,7 @@ function logCoords()
 		configFile.close();
 
 		//import the existing data file
-		// #include "/Volumes/Customization/Library/Scripts/Script Resources/Data/btconfiglog.js";
-		#include "/Volumes/Customization/Library/Scripts/Script Resources/Data/build_template_library.js";
+		eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/build_template_library.js\"");
 
 		var btData, person;
 		var curGarCode = config.garmentCode;

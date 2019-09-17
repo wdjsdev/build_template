@@ -35,8 +35,7 @@ function container()
 
 	function readConfig(code)
 	{
-		var btLib = new File("/Volumes/Customization/Library/Scripts/Script Resources/Data/build_template_library.js");
-		// var configFile = new File("~/Documents/btconfig.js");
+		var btLib = btLibraryFile;
 
 		eval("#include \"" + btLib.fsName + "\"");
 
@@ -335,6 +334,17 @@ function container()
 		try
 		{
 			var prepress = garLay.layers["Prepress"];
+
+
+			//delete any layers that exist on the prepress layer
+			//to avoid having duplicated size layers if the blank
+			//template file had empty size layers in the prepress layer
+			for(var dppl = prepress.layers.length - 1; dppl>=0; dppl--)
+			{
+				prepress.layers[dppl].remove();
+			}
+
+			
 			for(var a=0;a<sorted.length;a++)
 			{
 				var thisArray = sorted[a];

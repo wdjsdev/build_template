@@ -6,7 +6,7 @@ function logAddArtPlacement()
 
 	function readConfig()
 	{
-		var configFile = new File("~/Documents/btconfig.js");
+		var configFile = new File("~/Documents/build_template_config/btconfig.js");
 
 		if(!configFile.exists)
 		{
@@ -21,7 +21,7 @@ function logAddArtPlacement()
 
 	function writeDatabaseFile()
 	{
-		var cenLibFile = new File("/Volumes/Customization/Library/Scripts/Script Resources/Data/central_library.js");
+		var cenLibFile = centralLibraryFile;
 		var thisGarInfo = {};
 
 		var parenPat = /[\(\)]/g;
