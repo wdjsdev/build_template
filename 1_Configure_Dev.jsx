@@ -21,12 +21,13 @@ function buildConfig()
 	var valid = true;
 
 	// //Production Utilities
-	// eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.jsxbin\"");
-	// eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Batch_Framework.jsxbin\"");
+	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.jsxbin\"");
+	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Batch_Framework.jsxbin\"");
 	
 	//Dev Utilities
-	eval("#include \"/Volumes/Macintosh HD/Users/will.dowling/Desktop/automation/utilities/Utilities_Container.js\"");
-	eval("#include \"/Volumes/Macintosh HD/Users/will.dowling/Desktop/automation/utilities/Batch_Framework.js\"");
+	// eval("#include \"/Volumes/Macintosh HD/Users/will.dowling/Desktop/automation/utilities/Utilities_Container.js\"");
+	// eval("#include \"/Volumes/Macintosh HD/Users/will.dowling/Desktop/automation/utilities/Batch_Framework.js\"");
+
 
 
 
@@ -45,7 +46,7 @@ function buildConfig()
 	var devComponents = desktopPath + "/automation/build_template/components";
 	var prodComponents = "/Volumes/Customization/Library/Scripts/Script Resources/components/build_template";
 
-	var compFiles = includeComponents(devComponents,prodComponents,true);
+	var compFiles = includeComponents(devComponents,prodComponents,false);
 	if(compFiles && compFiles.length)
 	{
 		for(var x=0,len=compFiles.length;x<len;x++)
@@ -71,8 +72,6 @@ function buildConfig()
 
 	//=============================  /Components  ===============================//
 	/*****************************************************************************/
-
-	
 
 
 	//begin global variable stuff
