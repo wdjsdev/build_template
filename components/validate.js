@@ -1,6 +1,5 @@
 function validate(garmentCode,pieces,sizes,waistSizes,artLocs)
 {
-	alert("Beginning validate function with arguments:\n" + garmentCode + "\n" + pieces + "\n" + sizes + "\n" + waistSizes + "\n" + artLocs);
 	var result = true;
 	var errors = "";
 
