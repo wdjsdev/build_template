@@ -28,19 +28,19 @@ function validate(garmentCode,pieces,sizes,waistSizes,artLocs)
 	config.orientation = cadOrientation;
 
 	//validate the piecenames
-	processInputBox(pieces,"pieces",true);
+	processInputBox(pieces,"pieces");
 
 	//validate the sizes
-	processInputBox(sizes,"sizes",false);
+	processInputBox(sizes,"sizes");
 
 	//validate the waist sizes
 	if(varyingInseamSizing)
 	{
-		processInputBox(waistSizes,"waist",true)
+		processInputBox(waistSizes,"waist")
 	}
 
 	//validate the artwork locations
-	processInputBox(artLocs,"artLayers",true);
+	processInputBox(artLocs,"artLayers");
 
 
 	//display errors if any
@@ -52,9 +52,8 @@ function validate(garmentCode,pieces,sizes,waistSizes,artLocs)
 	return result;
 
 
-	function processInputBox(txt,label,changeCase)
+	function processInputBox(txt,label)
 	{
-		alert("processing " + label);
 		if(txt === "")
 		{
 			result = false;
@@ -64,11 +63,18 @@ function validate(garmentCode,pieces,sizes,waistSizes,artLocs)
 		
 		txt = txt.replace(rmSpacesPat,",");
 		var newArray = txt.split(",");
-		if(changeCase)
+		if(label === "pieces")
 		{
 			for(var x=0,len=newArray.length;x<len;x++)
 			{
 				newArray[x] = newArray[x].toTitleCase();
+			}
+		}
+		else
+		{
+			for(var x=0,len=newArray.length;x<len;x++)
+			{
+				newArray[x] = newArray[x].toUpperCase();
 			}
 		}
 		config[label] = newArray;
