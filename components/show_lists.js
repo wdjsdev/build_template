@@ -5,6 +5,11 @@ function showLists(overflow,inUse,listName)
 	var lbSize = [100,100,300,350];
 	var activeListbox;
 
+	//trim all the leading/trailing spaces from each element
+	//of the overflow and inUse arrays
+	overflow = trimSpacesArray(overflow);
+	inUse = trimSpacesArray(inUse);
+
 	//array of strings to return back to the configure script
 	//example result = ["Front Logo","Front Number","Player Name"];
 	var result = [];
