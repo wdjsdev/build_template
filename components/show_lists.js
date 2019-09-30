@@ -55,11 +55,12 @@ function showLists(overflow,inUse,listName)
 			
 		//group for buttons.. obviously
 		var navigationBtnGroup = UI.group(sld);
+			navigationBtnGroup.orientation = "column";
 			
 			var addRemoveGroup = UI.group(navigationBtnGroup);
-				addRemoveGroup.orientation = "column";
+				addRemoveGroup.orientation = "row";
 				//add the selection to the in use listbox
-				var addBtn = UI.button(addRemoveGroup,"Add Item(s)",function()
+				var addBtn = UI.button(addRemoveGroup,"<",function()
 				{
 					if(lbInUse.selection && lbInUse.selection.length)
 					{
@@ -67,17 +68,23 @@ function showLists(overflow,inUse,listName)
 					}
 					else if(lbOverflow.selection && lbOverflow.selection.length)
 					{
+						var curText,removeItems = [];
 						for(var x = lbOverflow.selection.length - 1; x>=0; x--)					
 						{
-							lbInUse.add("item",lbOverflow.selection[x].text);
-							lbOverflow.remove(lbOverflow.selection[x]);
+							curText = lbOverflow.selection[x].text;
+							lbInUse.add("item",curText);
+							removeItems.push(curText);
+							// lbOverflow.remove(lbOverflow.selection[x]);
 						}
+						removeItemsFromList(lbOverflow,removeItems);
+						selectItemsFromList(lbInUse,removeItems);
+						removeItems = [];
 					}
 				});
 
 
 				//remove the selection from the inUse listbox and place it in the overflow
-				var rmBtn = UI.button(addRemoveGroup,"Remove Item(s)",function()
+				var rmBtn = UI.button(addRemoveGroup,">",function()
 				{
 					if(lbOverflow.selection && lbOverflow.selection.length)
 					{
@@ -85,11 +92,17 @@ function showLists(overflow,inUse,listName)
 					}
 					else if(lbInUse.selection && lbInUse.selection.length)
 					{
+						var curText,removeItems = [];
 						for(var x = lbInUse.selection.length - 1; x>=0; x--)					
 						{
+							curText = lbInUse.selection[x].text;
 							lbOverflow.add("item",lbInUse.selection[x].text);
-							lbInUse.remove(lbInUse.selection[x]);
+							removeItems.push(curText);
+							// lbInUse.remove(lbInUse.find(curText));
 						}
+						removeItemsFromList(lbInUse,removeItems);
+						selectItemsFromList(lbOverflow,removeItems);
+						removeItems = [];
 					}
 				});
 
@@ -166,7 +179,7 @@ function showLists(overflow,inUse,listName)
 						addItem(newInput.text);
 					}
 				})
-			var newArtLocBtn = UI.button(nlGroup,"Add Item",function()
+			var newArtLocBtn = UI.button(nlGroup,"Add New Item",function()
 			{
 				addItem(newInput.text);
 			})
