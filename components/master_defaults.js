@@ -7,8 +7,8 @@ var MASTER_DEFAULTS =
 	},
 	"sizes":
 	{
-		"overflow":["XXXS","XXS","4XL","5XL","24x26","26x19","26x28","28x20","28x28","30x21","30x28","22I","24I","26I","28I","30I","32I","34I"],
-		"inUse":["XS","S","M","L","XL","2XL","3XL"]
+		"overflow":["XS","S","M","L","XL","2XL","3XL","4XL","5XL","WXXS","WXS","WS","WM","WL","WXL","W2XL","W3XL","W4XL","YXS","YS","YM","YL","YXL","Y2XL","GXS","GS","GM","GL","GXL","G2XL"],
+		"inUse":[]
 	},
 	"waist_sizes":
 	{

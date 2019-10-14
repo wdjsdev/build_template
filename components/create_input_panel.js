@@ -8,7 +8,12 @@ function createInputPanel(parent,listName,msg)
 			var input = newPanel.input = UI.edit(inputRow,userDefaults[listName].inUse,65);
 			var showListBtn = UI.button(inputRow,"Show Lists",function()
 			{
-				var currentInput = input.text.split(",");
+
+				var currentInput = [];
+				if(input.text.length)
+				{
+					currentInput = input.text.split(",");
+				}
 				var listResult = showLists(userDefaults[listName].overflow,currentInput,listName);
 				if(listResult)
 				{
