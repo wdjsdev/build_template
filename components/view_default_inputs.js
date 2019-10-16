@@ -24,7 +24,7 @@ function viewDefaultInputs(listName)
 	}
 
 	var lbSize = [100,100,250,250];
-	var di = new Window("dialog","Default Inputs");
+	var di = new Window("dialog",listName.toTitleCase() + " Default Inputs");
 		di.orientation = "column";
 		var lbGroup = UI.group(di);
 			lbGroup.orientation = "row";
