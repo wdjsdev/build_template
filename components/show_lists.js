@@ -153,27 +153,6 @@ function showLists(overflow,inUse,listName)
 		//BUTTONS
 		//
 
-		var closeBtnsGroup = UI.group(sld);
-
-			var cancelBtn = UI.button(closeBtnsGroup,"Cancel",function()
-			{
-				result = undefined;
-				sld.close();
-			})
-			var submitBtn = UI.button(closeBtnsGroup,"Submit", function()
-			{
-				result = [];
-				for(var x=0,len=lbInUse.items.length;x<len;x++)
-				{
-					if(lbInUse.items[x].text !== "")
-					{
-						result.push(lbInUse.items[x].text);
-					}
-				}
-				sld.close();
-				
-			})
-
 
 
 		var defaultActionsGroup = UI.group(sld)
@@ -183,7 +162,7 @@ function showLists(overflow,inUse,listName)
 				var whichDefaults = new Window("dialog","Choose Default Set");
 					var wdBtnGroup = UI.group(whichDefaults);
 						wdBtnGroup.orientation = "column";
-						var saveDefaults = UI.button(wdBtnGroup,"Save Defaults",function()
+						var saveDefaults = UI.button(wdBtnGroup,"Save My Defaults",function()
 						{
 							action = "save";
 							whichDefaults.close();
@@ -193,12 +172,19 @@ function showLists(overflow,inUse,listName)
 							action = "user";
 							whichDefaults.close();
 						});
-						var globalDefaults = UI.button(wdBtnGroup,"Load Standard Defaults",function()
-						{
-							selectedDefaults = viewDefaultInputs();
-							action = "standard";
-							whichDefaults.close();
-						});
+						// var globalDefaults = UI.button(wdBtnGroup,"Load Standard Defaults",function()
+						// {
+						// 	selectedDefaults = viewDefaultInputs(listName);
+						// 	if(!selectedDefaults)
+						// 	{
+						// 		action = undefined;
+						// 	}
+						// 	else
+						// 	{
+						// 		action = "standard";
+						// 	}
+						// 	whichDefaults.close();
+						// });
 						// var globalDefaults = UI.button(wdBtnGroup,"Load Standard Defaults",function()
 						// {
 						// 	action = "standard";
@@ -256,6 +242,10 @@ function showLists(overflow,inUse,listName)
 						overflow = userDefaults[listName].overflow;
 						inUse = userDefaults[listName].inUse;
 					}
+					else
+					{
+						return;
+					}
 
 
 					//reset extraLocs listbox
@@ -278,6 +268,37 @@ function showLists(overflow,inUse,listName)
 						lbInUse.add("item",inUse[x]);
 					}
 				}
+			})
+			var standardInputs = UI.button(defaultActionsGroup,"Standard Inputs",function()
+			{
+				selectedDefaults = viewDefaultInputs(listName);
+				if(selectedDefaults)
+				{
+					inUse = selectedDefaults;
+				}
+				removeItemsFromList(lbInUse);
+				addItemsToList(lbInUse,inUse);
+			})
+
+		var closeBtnsGroup = UI.group(sld);
+
+			var cancelBtn = UI.button(closeBtnsGroup,"Cancel",function()
+			{
+				result = undefined;
+				sld.close();
+			})
+			var submitBtn = UI.button(closeBtnsGroup,"Submit", function()
+			{
+				result = [];
+				for(var x=0,len=lbInUse.items.length;x<len;x++)
+				{
+					if(lbInUse.items[x].text !== "")
+					{
+						result.push(lbInUse.items[x].text);
+					}
+				}
+				sld.close();
+				
 			})
 			
 	sld.show();
