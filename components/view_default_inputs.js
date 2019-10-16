@@ -24,7 +24,7 @@ function viewDefaultInputs(listName)
 	}
 
 	var lbSize = [100,100,250,250];
-	var di = new Window("dialog",listName.toTitleCase() + " Default Inputs");
+	var di = new Window("dialog",listName.toTitleCase() + " Standard Inputs");
 		di.orientation = "column";
 		var lbGroup = UI.group(di);
 			lbGroup.orientation = "row";
@@ -36,15 +36,15 @@ function viewDefaultInputs(listName)
 			var selectedDefaults = UI.edit(di,"",80);
 
 		var updateBtnGroup = UI.group(di);
-			var updateBtn = UI.button(updateBtnGroup,"Update Currently Selected Defaults",function()
+			var updateBtn = UI.button(updateBtnGroup,"Update Currently Selected Items",function()
 			{
 				defaultInputs[listName][lb1Selection] = selectedDefaults.text.split(",");
 				writeDatabase(dataFile);
 			})
 		
-		var newDefaultGroup = UI.panel(di);
+		var newDefaultGroup = UI.panel(di,"New Default Set");
 			newDefaultGroup.orientation = "column";
-			var newDefaultText = UI.static(newDefaultGroup,"Add a new default group:");
+			var newDefaultText = UI.static(newDefaultGroup,"Add a new default set:");
 			var labelGroup = UI.group(newDefaultGroup);
 				labelGroup.orientation = "row";
 				var labelTxt = UI.static(labelGroup,"Enter a label");
@@ -73,10 +73,12 @@ function viewDefaultInputs(listName)
 				var items = trimSpaces(itemInput.text);
 				defaultInputs[listName][label] = items.split(",");
 				writeDatabase(dataFile);
-				lb1.add("item",label.toTitleCase());
+				lb1.add("item",label.toTitleCase().replace(/\s/g,"_"));
 				lb1.selection = lb1.find(label.toTitleCase());
 				selectedDefaults.text = items;
 				arr.push(label.toTitleCase());
+				labelInput.text = "";
+				itemInput.text = "";
 			})
 		
 		var closeBtnGroup = UI.group(di);
@@ -84,7 +86,7 @@ function viewDefaultInputs(listName)
 			{
 				di.close();
 			})
-			var submit = UI.button(closeBtnGroup,"Use These Defaults",function()
+			var submit = UI.button(closeBtnGroup,"Use These Items",function()
 			{
 				result = selectedDefaults.text.split(",");
 				di.close();
@@ -169,7 +171,7 @@ function viewDefaultInputs(listName)
 		file.open("w");
 		file.write("var defaultInputs = " + JSON.stringify(defaultInputs));
 		file.close();
-		alert("Defaults for " + listName.toTitleCase() + " have been updated.");
+		alert("Standard inputs for " + listName.toTitleCase() + " have been updated.");
 	}
 	function populateListbox(lb,items)
 	{

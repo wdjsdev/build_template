@@ -89,6 +89,13 @@ function makeDialog()
 
 		//group for buttons
 		var btnGroup = w.add("group");
+			var cancel = btnGroup.add("button", undefined, "Cancel");
+				cancel.onClick = function()
+				{
+					dialogSuccess = false;
+					w.close();
+				}
+				
 			var submit = btnGroup.add("button", undefined, "Submit");
 				submit.onClick = function()
 				{
@@ -98,12 +105,6 @@ function makeDialog()
 						w.close();
 					}
 					else{};
-				}
-			var cancel = btnGroup.add("button", undefined, "Cancel");
-				cancel.onClick = function()
-				{
-					dialogSuccess = false;
-					w.close();
 				}
 	w.show();
 
