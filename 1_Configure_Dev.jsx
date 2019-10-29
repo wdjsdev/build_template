@@ -19,6 +19,7 @@
 function buildConfig()
 {
 	var valid = true;
+	var scriptName = "build_template_config";
 
 	// //Production Utilities
 	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.jsxbin\"");
@@ -34,17 +35,10 @@ function buildConfig()
 	/*****************************************************************************/
 	//==============================  Components  ===============================//
 
-	if(user === "will.dowling")
-	{
-		logDest.push(File(desktopPath + "/automation/logs/bt_configure_dev_log.txt"));
-	}
-	else
-	{
-		logDest.push(File("/Volumes/Customization/Library/Scripts/Script Resources/Data/.script_logs/bt_configure_log.txt"));
-	}
+	logDest.push(getLogDest());
 
 	var devComponents = desktopPath + "/automation/build_template/components";
-	var prodComponents = "/Volumes/Customization/Library/Scripts/Script Resources/components/build_template";
+	var prodComponents = componentsPath + "build_template";
 
 	var compFiles = includeComponents(devComponents,prodComponents,false);
 	if(compFiles && compFiles.length)
@@ -144,7 +138,7 @@ function buildConfig()
 	{
 		Folder(configFileLoc).create();
 	}
-	var centralConfigLoc = "/Volumes/Customization/Library/Scripts/Script Resources/Data/";
+	
 	var config =
 	{
 		"garmentCode":"",

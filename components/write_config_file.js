@@ -4,8 +4,6 @@ function writeConfigFile(config)
 
 	var configFile = new File(configFileLoc + "/btconfig.js");
 
-	var btConfigLog = new File(centralConfigLoc + "/btconfiglog.txt");
-
 	if(configFile.exists)
 	{
 		overwrite = confirm("Do you want to overwrite the existing config file?");
