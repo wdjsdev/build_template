@@ -18,7 +18,23 @@ Progress:
 function container()
 {
 
+	var valid = true;
+	var scriptName = "build_template";
+
+	//Production Utilities
 	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.jsxbin\"");
+	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Batch_Framework.jsxbin\"");
+	
+	// //Dev Utilities
+	// eval("#include \"/Volumes/Macintosh HD/Users/will.dowling/Desktop/automation/utilities/Utilities_Container.js\"");
+	// eval("#include \"/Volumes/Macintosh HD/Users/will.dowling/Desktop/automation/utilities/Batch_Framework.js\"");
+
+
+	if(!valid)
+	{
+		return;
+	}
+
 
 	/*****************************************************************************/
 
@@ -560,7 +576,6 @@ function container()
 	////////////////////
 
 	var docRef = app.activeDocument;
-	var valid = true;
 	var layers = docRef.layers;
 	var swatches = docRef.swatches;
 	var errorList = [];

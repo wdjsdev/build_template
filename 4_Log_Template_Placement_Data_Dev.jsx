@@ -2,8 +2,15 @@
 function logCoords()
 {
 	var valid = true;
-	//add in the utilities container
+	var scriptName = "log_template_placement";
+
+	//Production Utilities
 	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.jsxbin\"");
+	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Batch_Framework.jsxbin\"");
+	
+	// //Dev Utilities
+	// eval("#include \"/Volumes/Macintosh HD/Users/will.dowling/Desktop/automation/utilities/Utilities_Container.js\"");
+	// eval("#include \"/Volumes/Macintosh HD/Users/will.dowling/Desktop/automation/utilities/Batch_Framework.js\"");
 
 	//file locations
 	var configFile = new File(documentsPath + "build_template_config/btconfig.js");
@@ -28,16 +35,14 @@ function logCoords()
 
 		var btConfigLog = btLibraryFile;
 
-		//trim the parentheses from the config.toSource() return value;
-		var parenPat = /[\(\)]/g;
-		var str = "var config = " + JSON.stringify(config).replace(parenPat,"");
+		var str = "var config = " + JSON.stringify(config);
 
 		configFile.open("w");
 		configFile.write(str);
 		configFile.close();
 
 		//import the existing data file
-		eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/build_template_library.js\"");
+		eval("#include \"" + btLibraryPath + "\"");
 
 		var btData, person;
 		var curGarCode = config.garmentCode;
@@ -74,17 +79,16 @@ function logCoords()
 				"Do you want to overwrite the existing data?");
 		}
 
-		if(!overwrite)
+		if(overwrite)
 		{
-			alert('No change was made to the data.');
-			result = false;
+			templateInfo[curGarCode] = config;
+			var newContents = "var templateInfo = " + JSON.stringify(templateInfo);
+			writeDatabase(btConfigLog,newContents);
 		}
 		else
 		{
-			templateInfo[curGarCode] = config;
-			btConfigLog.open("w");
-			btConfigLog.write("var templateInfo = " + JSON.stringify(templateInfo).replace(parenPat,""));
-			btConfigLog.close();
+			alert('No change was made to the data.');
+			result = false;
 		}
 		return result;
 		
