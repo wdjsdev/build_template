@@ -1,8 +1,8 @@
 function writeConfigFile(config)
 {
 	var overwrite = true;
-
-	var configFile = new File(configFileLoc + "/btconfig.js");
+	
+	var configFile = new File(configFileLoc + "btconfig.js");
 
 	if(configFile.exists)
 	{
@@ -13,8 +13,9 @@ function writeConfigFile(config)
 	{
 		//trim the parentheses from the config.toSource() return value;
 		var parenPat = /[\(\)]/g;
-		var str = "var config = " + config.toSource().replace(parenPat,"");
+		// var str = "var config = " + config.toSource().replace(parenPat,"");
 		// str = "var config = \n" + str.replace(parenPat,"");
+		var str = "var config = " + JSON.stringify(config);
 
 		configFile.open("w");
 		configFile.write(str);

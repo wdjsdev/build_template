@@ -13,15 +13,18 @@ function validate(garmentCode,pieces,sizes,waistSizes,artLocs)
 	//validate the garment code
 	garmentCode = garmentCode.toUpperCase();
 	garmentCode = garmentCode.replace("_","-");
-	if(!gcPat.test(garmentCode))
-	{
-		result = false;
-		errors += "The garment code you entered was not in the correct format.\n";
-	}
-	else
-	{
-		config.garmentCode = garmentCode;
-	}
+	// if(!gcPat.test(garmentCode))
+	// {
+	// 	result = false;
+	// 	errors += "The garment code you entered was not in the correct format.\n";
+	// }
+	// else
+	// {
+	// 	config.garmentCode = garmentCode;
+	// }
+
+	//removed the validation because there are too many possible formats at this time.
+	config.garmentCode = garmentCode;
 
 	//set orientation preference
 	config.orientation = cadOrientation;
