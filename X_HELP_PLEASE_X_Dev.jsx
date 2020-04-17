@@ -1,3 +1,4 @@
+#target Illustrator
 function help()
 {
 	var valid = true;
@@ -29,7 +30,7 @@ function help()
 
 	}
 
-	
+
 	var utilitiesPath = getUtilities();
 	if(utilitiesPath)
 	{

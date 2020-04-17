@@ -1,3 +1,5 @@
+
+#target Illustrator
 function initialRename()
 {
 	var valid = true;

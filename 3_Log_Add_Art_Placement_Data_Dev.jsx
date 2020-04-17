@@ -1,3 +1,4 @@
+#target Illustrator
 function logAddArtPlacement()
 {
 	var valid = true;

@@ -1,4 +1,4 @@
-
+#target Illustrator
 function logCoords()
 {
 	var valid = true;

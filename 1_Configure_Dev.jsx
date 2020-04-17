@@ -16,6 +16,7 @@
 
 */
 
+#target Illustrator
 function buildConfig()
 {
 	var valid = true;
@@ -171,7 +172,7 @@ function buildConfig()
 	//variable to keep track of orientation of the CAD
 	var cadOrientation = "vertical";
 
-	var configFileLoc = documentsPath + "build_template_config";
+	var configFileLoc = documentsPath + "build_template_config/";
 	if(!Folder(configFileLoc).exists)
 	{
 		Folder(configFileLoc).create();
