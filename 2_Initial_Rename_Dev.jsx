@@ -58,7 +58,7 @@ function initialRename()
 			return false;
 		}
 
-		eval("#include \"" + configFile.fsName + "\"");
+		eval("#include \"" + configFile.fullName + "\"");
 
 		return config;
 	}

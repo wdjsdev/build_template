@@ -75,7 +75,7 @@ function buildConfig()
 		{
 			try
 			{
-				eval("#include \"" + compFiles[x].fsName + "\"");
+				eval("#include \"" + compFiles[x].fullName + "\"");
 			}
 			catch(e)
 			{
