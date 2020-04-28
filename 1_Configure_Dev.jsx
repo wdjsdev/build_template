@@ -16,20 +16,49 @@
 
 */
 
+#target Illustrator
 function buildConfig()
 {
 	var valid = true;
 	var scriptName = "build_template_config";
 
-	// //Production Utilities
-	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.jsxbin\"");
-	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Batch_Framework.jsxbin\"");
-	
-	// Dev Utilities
-	// eval("#include \"/Volumes/Macintosh HD/Users/will.dowling/Desktop/automation/utilities/Utilities_Container.js\"");
-	// eval("#include \"/Volumes/Macintosh HD/Users/will.dowling/Desktop/automation/utilities/Batch_Framework.js\"");
+	function getUtilities()
+	{
+		var result;
+		var networkPath,utilPath;
+		if($.os.match("Windows"))
+		{
+			networkPath = "//AD4/Customization/";
+		}
+		else
+		{
+			networkPath = "/Volumes/Customization/";
+		}
 
 
+		utilPath = decodeURI(networkPath + "Library/Scripts/Script Resources/Data/");
+
+		
+		if(Folder(utilPath).exists)
+		{
+			result = utilPath;
+		}
+
+		return result;
+
+	}
+
+	var utilitiesPath = getUtilities();
+	if(utilitiesPath)
+	{
+		eval("#include \"" + utilitiesPath + "Utilities_Container.jsxbin" + "\"");
+		eval("#include \"" + utilitiesPath + "Batch_Framework.jsxbin" + "\"");
+	}
+	else
+	{
+		alert("Failed to find the utilities..");
+		return false;	
+	}
 
 
 	/*****************************************************************************/
@@ -37,7 +66,7 @@ function buildConfig()
 
 	logDest.push(getLogDest());
 
-	var devComponents = desktopPath + "/automation/build_template/components";
+	var devComponents = desktopPath + "automation/build_template/components";
 	var prodComponents = componentsPath + "build_template";
 
 	var compFiles = includeComponents(devComponents,prodComponents,false);
@@ -47,7 +76,7 @@ function buildConfig()
 		{
 			try
 			{
-				eval("#include \"" + compFiles[x].fsName + "\"");
+				eval("#include \"" + compFiles[x].fullName + "\"");
 			}
 			catch(e)
 			{
@@ -76,10 +105,20 @@ function buildConfig()
 	//and resetting defaults back to global defaults
 	//if personal defaults go haywire.
 
-	var defaultFilesPath = documentsPath + "/build_template_defaults/"
+	var defaultFilesPath = documentsPath + "build_template_defaults/"
 	var defaultFileFolder = Folder(defaultFilesPath);
 	if(!defaultFileFolder.exists)
 	{
+		defaultFileFolder.create();
+	}
+
+	//check to see whether the folder still doesn't exist..
+	//if so, then likely there's an issue with naming of the
+	//main hard drive?
+	if(!defaultFileFolder.exists)
+	{
+		defaultFilesPath = "~/Documents/build_template_defaults/";
+		defaultFileFolder = Folder(defaultFilesPath);
 		defaultFileFolder.create();
 	}
 
@@ -133,7 +172,7 @@ function buildConfig()
 	//variable to keep track of orientation of the CAD
 	var cadOrientation = "vertical";
 
-	var configFileLoc = documentsPath + "build_template_config";
+	var configFileLoc = documentsPath + "build_template_config/";
 	if(!Folder(configFileLoc).exists)
 	{
 		Folder(configFileLoc).create();

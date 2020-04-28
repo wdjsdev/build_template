@@ -21,13 +21,43 @@ function container()
 	var valid = true;
 	var scriptName = "build_template";
 
-	//Production Utilities
-	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Utilities_Container.jsxbin\"");
-	eval("#include \"/Volumes/Customization/Library/Scripts/Script Resources/Data/Batch_Framework.jsxbin\"");
-	
-	// //Dev Utilities
-	// eval("#include \"/Volumes/Macintosh HD/Users/will.dowling/Desktop/automation/utilities/Utilities_Container.js\"");
-	// eval("#include \"/Volumes/Macintosh HD/Users/will.dowling/Desktop/automation/utilities/Batch_Framework.js\"");
+	function getUtilities()
+	{
+		var result;
+		var networkPath,utilPath;
+		if($.os.match("Windows"))
+		{
+			networkPath = "//AD4/Customization/";
+		}
+		else
+		{
+			networkPath = "/Volumes/Customization/";
+		}
+
+
+		utilPath = decodeURI(networkPath + "Library/Scripts/Script Resources/Data/");
+
+		
+		if(Folder(utilPath).exists)
+		{
+			result = utilPath;
+		}
+
+		return result;
+
+	}
+
+	var utilitiesPath = getUtilities();
+	if(utilitiesPath)
+	{
+		eval("#include \"" + utilitiesPath + "Utilities_Container.jsxbin" + "\"");
+		eval("#include \"" + utilitiesPath + "Batch_Framework.jsxbin" + "\"");
+	}
+	else
+	{
+		alert("Failed to find the utilities..");
+		return false;	
+	}
 
 
 	if(!valid)
@@ -53,7 +83,7 @@ function container()
 	{
 		var btLib = btLibraryFile;
 
-		eval("#include \"" + btLib.fsName + "\"");
+		eval("#include \"" + btLibraryPath + "\"");
 
 		if(!templateInfo[code])
 		{

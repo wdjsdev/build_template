@@ -7,7 +7,7 @@ function viewDefaultInputs(listName)
 
 	//for development
 	// var dataFile = File(desktopPath + "/automation/build_template/data/default_inputs.js");
-	var dataFile = File(dataPath + "/default_template_builder_inputs.js")
+	var dataFile = File(dataPath + "default_template_builder_inputs.js")
 
 	eval("#include \"" + dataFile.fullName + "\"");
 
