@@ -10,7 +10,8 @@ function makeDialog()
 		// var gcGroup = w.add("group");
 		var gcGroup = w.add("panel");
 			var gcTxt = UI.static(gcGroup,"Enter The Garment Code: ");
-			var gcInput = UI.edit(gcGroup,"eg.FD-161Y");
+			var sampleGcInput = (config.garmentCode && config.garmentCode !== "") ? config.garmentCode : "eg.FD-161Y"
+			var gcInput = UI.edit(gcGroup,sampleGcInput);
 				gcInput.active = true;
 				gcInput.characters = 12;
 
@@ -21,7 +22,6 @@ function makeDialog()
 			//group for radio buttons
 			var oriRadioGroup = oriGroup.add("group");
 				var oriVert = oriRadioGroup.add("radiobutton", undefined, "Vertical");
-					oriVert.value = true;
 					oriVert.onClick = function()
 					{
 						cadOrientation = "vertical";
@@ -32,6 +32,15 @@ function makeDialog()
 					{
 						cadOrientation = "horizontal";
 					}
+
+				if(config.orientation && (config.orientation === "" || config.orientation === "vertical"))
+				{
+					oriVert.value = true;
+				}
+				else
+				{
+					oriHorz.value = true;
+				}
 
 			var help = UI.button(oriGroup,"Help",function()
 			{
@@ -77,10 +86,13 @@ function makeDialog()
 				});
 				sizeStructureRadioButtons[0].value = true;
 
-		var pieceNameGroup = createInputPanel(w,"piece_names");
+
+	
+
+		var pieceNameGroup = createInputPanel(w,"pieces");
 		var sizeGroup = createInputPanel(w,"sizes");
-		var waistSizeGroup = createInputPanel(w,"waist_sizes");
-		var artLocGroup = createInputPanel(w,"locations");
+		var waistSizeGroup = createInputPanel(w,"waist");
+		var artLocGroup = createInputPanel(w,"artLayers");
 
 		//set the waist size input to disabled until
 		//the user selects variable inseam 
