@@ -68,6 +68,11 @@ function buildConfig()
 
 	if(!valid)return;
 
+	if(user === "will.dowling")
+	{
+		DEV_LOGGING = true;
+	}
+
 
 	/*****************************************************************************/
 	//==============================  Components  ===============================//
@@ -133,7 +138,7 @@ function buildConfig()
 	
 
 	var userDefaults = {
-		"piece_names": 
+		"pieces": 
 		{
 			"overflow":[],
 			"inUse":[],
@@ -145,13 +150,13 @@ function buildConfig()
 			"inUse":[],
 			"file":File(defaultFilesPath + "build_template_default_sizes.js")
 		},
-		"waist_sizes":
+		"waist":
 		{
 			"overflow":[],
 			"inUse":[],
 			"file":File(defaultFilesPath + "build_template_default_waist_sizes.js")	
 		},
-		"locations":
+		"artLayers":
 		{
 			"overflow":[],
 			"inUse":[],
@@ -185,16 +190,30 @@ function buildConfig()
 	{
 		Folder(configFileLoc).create();
 	}
-	
-	var config =
+
+
+
+	//try to import the 
+	var configFilePath = configFileLoc + "btconfig.js"
+	var configFile = new File(configFilePath);
+
+	if(configFile.exists)
 	{
-		"garmentCode":"",
-		"orientation":"",
-		"pieces":[],
-		"sizes":[],
-		"waist":undefined,
-		"artLayers":[]
+		eval("#include \"" + configFilePath + "\"");
 	}
+	else
+	{
+		var config =
+		{
+			"garmentCode":"",
+			"orientation":"",
+			"pieces":[],
+			"sizes":[],
+			"waist":undefined,
+			"artLayers":[]
+		}	
+	}
+	
 
 	var sizingStructures = ["Regular Sizing", "Pants Sizing", "Varying Inseams"];
 
