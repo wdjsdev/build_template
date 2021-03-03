@@ -40,6 +40,10 @@ function validate(garmentCode,pieces,sizes,waistSizes,artLocs)
 	{
 		processInputBox(waistSizes,"waist")
 	}
+	else
+	{
+		config.waist = undefined;
+	}
 
 	//validate the artwork locations
 	processInputBox(artLocs,"artLayers");
