@@ -11,7 +11,7 @@ function createInputPanel(parent,listName,msg)
 
 	var newPanel = parent.add("panel");
 		newPanel.orientation = "column";
-		var txt = UI.static(newPanel,"Please select the necessary " + (listName === "sizes" ? "sizes/inseams" + "." : "sizes."));
+		var txt = UI.static(newPanel,"Please select the necessary " + msg + ".");
 		var txt2 = UI.static(newPanel,"Separate each value by a comma.")
 		var inputRow = UI.group(newPanel);
 			var input = newPanel.input = UI.edit(inputRow,(useExisting ? config[listName] : userDefaults[listName].inUse),65);
