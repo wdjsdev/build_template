@@ -89,10 +89,10 @@ function makeDialog()
 
 	
 
-		var pieceNameGroup = createInputPanel(w,"pieces");
-		var sizeGroup = createInputPanel(w,"sizes");
-		var waistSizeGroup = createInputPanel(w,"waist");
-		var artLocGroup = createInputPanel(w,"artLayers");
+		var pieceNameGroup = createInputPanel(w,"pieces","piece names");
+		var sizeGroup = createInputPanel(w,"sizes","sizes");
+		var waistSizeGroup = createInputPanel(w,"waist","waist sizes");
+		var artLocGroup = createInputPanel(w,"artLayers","art layers");
 
 		//set the waist size input to disabled until
 		//the user selects variable inseam 
