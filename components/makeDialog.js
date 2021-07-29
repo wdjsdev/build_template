@@ -8,16 +8,16 @@ function makeDialog()
 
 		//group for garment code entry:
 		// var gcGroup = w.add("group");
-		var gcGroup = w.add("panel");
-			var gcTxt = UI.static(gcGroup,"Enter The Garment Code: ");
+		var gcGroup = w.add("panel",undefined,"Enter The Garment Code: ");
+			// var gcTxt = UI.static(gcGroup,"Enter The Garment Code: ");
 			var sampleGcInput = (config.garmentCode && config.garmentCode !== "") ? config.garmentCode : "eg.FD-161Y"
 			var gcInput = UI.edit(gcGroup,sampleGcInput);
 				gcInput.active = true;
 				gcInput.characters = 12;
 
 		//group for orientation of CAD:
-		var oriGroup = w.add("panel");
-			var oriTxt = UI.static(oriGroup,"Select the orientation of the CAD layout.");
+		var oriGroup = w.add("panel",undefined,"Select the orientation of the CAD layout.");
+			// var oriTxt = UI.static(oriGroup,"Select the orientation of the CAD layout.");
 			
 			//group for radio buttons
 			var oriRadioGroup = oriGroup.add("group");
@@ -65,9 +65,9 @@ function makeDialog()
 			})
 
 		//group for selection of sizing structure
-		var selectSizeStructureGroup = w.add("panel");
+		var selectSizeStructureGroup = w.add("panel",undefined,"Select the appropriate sizing format.");
 			selectSizeStructureGroup.orientation = "column";
-			var sssgTxt = selectSizeStructureGroup.add("statictext", undefined, "Select the appropriate sizing format.");
+			// var sssgTxt = selectSizeStructureGroup.add("statictext", undefined, "Select the appropriate sizing format.");
 
 			var selectSizeStructureRadioGroup = UI.group(selectSizeStructureGroup);
 				selectSizeStructureRadioGroup.orientation = "row";

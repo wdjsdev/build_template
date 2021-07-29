@@ -15,6 +15,7 @@ Progress:
 
 */
 
+#target Illustrator
 function container()
 {
 
