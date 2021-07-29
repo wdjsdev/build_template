@@ -33,6 +33,30 @@ function makeDialog()
 						cadOrientation = "horizontal";
 					}
 
+				var help = oriRadioGroup.add("radiobutton", undefined, "Help");
+					help.onClick = function()
+					{
+						var h = new Window("dialog","Orientation Help");
+							var msg = UI.static(h,"Orientation Help");
+							var imgGroup = UI.group(h);
+								imgGroup.orientation = "row";
+								var vertImageGroup = UI.group(imgGroup);
+									vertImageGroup.orientation = "column";
+									var vertMsg = UI.static(vertImageGroup, "Vertical Orientation");
+									var vertImg = UI.image(vertImageGroup, resourcePath + "/Images/vertical_orientation.jpg");
+								var horzImageGroup = UI.group(imgGroup);
+									horzImageGroup.orientation = "column";
+									var horzMsg = UI.static(horzImageGroup, "Horizontal Orientation");
+									var horzImg = UI.image(horzImageGroup, resourcePath + "/Images/horizontal_orientation.jpg");
+							var btnGroup = UI.group(h);
+								var thanks = UI.button(btnGroup,"Thanks",function()
+								{
+									h.close();
+								});
+						h.show();
+						oriVert.value = true;
+					}
+
 				if(config.orientation && (config.orientation === "" || config.orientation === "vertical"))
 				{
 					oriVert.value = true;
@@ -42,27 +66,27 @@ function makeDialog()
 					oriHorz.value = true;
 				}
 
-			var help = UI.button(oriGroup,"Help",function()
-			{
-				var h = new Window("dialog","Orientation Help");
-					var msg = UI.static(h,"Orientation Help");
-					var imgGroup = UI.group(h);
-						imgGroup.orientation = "row";
-						var vertImageGroup = UI.group(imgGroup);
-							vertImageGroup.orientation = "column";
-							var vertMsg = UI.static(vertImageGroup, "Vertical Orientation");
-							var vertImg = UI.image(vertImageGroup, resourcePath + "/Images/vertical_orientation.jpg");
-						var horzImageGroup = UI.group(imgGroup);
-							horzImageGroup.orientation = "column";
-							var horzMsg = UI.static(horzImageGroup, "Horizontal Orientation");
-							var horzImg = UI.image(horzImageGroup, resourcePath + "/Images/horizontal_orientation.jpg");
-					var btnGroup = UI.group(h);
-						var thanks = UI.button(btnGroup,"Thanks",function()
-						{
-							h.close();
-						});
-				h.show();
-			})
+			// var help = UI.button(oriGroup,"Help",function()
+			// {
+			// 	var h = new Window("dialog","Orientation Help");
+			// 		var msg = UI.static(h,"Orientation Help");
+			// 		var imgGroup = UI.group(h);
+			// 			imgGroup.orientation = "row";
+			// 			var vertImageGroup = UI.group(imgGroup);
+			// 				vertImageGroup.orientation = "column";
+			// 				var vertMsg = UI.static(vertImageGroup, "Vertical Orientation");
+			// 				var vertImg = UI.image(vertImageGroup, resourcePath + "/Images/vertical_orientation.jpg");
+			// 			var horzImageGroup = UI.group(imgGroup);
+			// 				horzImageGroup.orientation = "column";
+			// 				var horzMsg = UI.static(horzImageGroup, "Horizontal Orientation");
+			// 				var horzImg = UI.image(horzImageGroup, resourcePath + "/Images/horizontal_orientation.jpg");
+			// 		var btnGroup = UI.group(h);
+			// 			var thanks = UI.button(btnGroup,"Thanks",function()
+			// 			{
+			// 				h.close();
+			// 			});
+			// 	h.show();
+			// })
 
 		//group for selection of sizing structure
 		var selectSizeStructureGroup = w.add("panel",undefined,"Select the appropriate sizing format.");
