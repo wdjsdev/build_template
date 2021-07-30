@@ -82,7 +82,7 @@ function buildConfig()
 	var devComponents = desktopPath + "automation/build_template/components";
 	var prodComponents = componentsPath + "build_template";
 
-	var compFiles = includeComponents(devComponents,prodComponents,false);
+	var compFiles = includeComponents(devComponents,prodComponents,true);
 	if(compFiles && compFiles.length)
 	{
 		for(var x=0,len=compFiles.length;x<len;x++)
@@ -172,7 +172,7 @@ function buildConfig()
 		}
 		eval("#include \"" + userDefaults[list].file.fullName + "\"");
 		userDefaults[list].inUse = inUse;
-		userDefaults[list].overflow = overflow; 
+		userDefaults[list].overflow = overflow;
 	}
 
 	
