@@ -111,7 +111,20 @@ function makeDialog()
 				sizeStructureRadioButtons[0].value = true;
 
 
-	
+		
+		var rotationGroup = w.add("panel",undefined,"If any pieces need to be rotated, input them here.");
+			var rotTxt = UI.static(rotationGroup,"Enter the rotation angle. Positive numbers are counterclockwise.");
+			var rg = UI.group(rotationGroup);
+				rg.orientation = "row";
+				var rotGroup = UI.group(rg);
+					rotGroup.orientation = "column";
+					var rot1 = UI.edit(rotGroup,"Rotation in degrees");
+					var rot1 = UI.edit(rotGroup,"Rotation in degrees");
+				
+				var pieceGroup = UI.group(rg);
+					pieceGroup.orientation = "column";
+					var piece1 = UI.edit(pieceGroup,"eg. Front, Back, Left Sleeve, Right Sleeve",50);
+					var piece2 = UI.edit(pieceGroup,"eg. Front, Back, Left Sleeve, Right Sleeve",50);
 
 		var pieceNameGroup = createInputPanel(w,"pieces","piece names");
 		var sizeGroup = createInputPanel(w,"sizes","sizes");
