@@ -66,28 +66,6 @@ function makeDialog()
 					oriHorz.value = true;
 				}
 
-			// var help = UI.button(oriGroup,"Help",function()
-			// {
-			// 	var h = new Window("dialog","Orientation Help");
-			// 		var msg = UI.static(h,"Orientation Help");
-			// 		var imgGroup = UI.group(h);
-			// 			imgGroup.orientation = "row";
-			// 			var vertImageGroup = UI.group(imgGroup);
-			// 				vertImageGroup.orientation = "column";
-			// 				var vertMsg = UI.static(vertImageGroup, "Vertical Orientation");
-			// 				var vertImg = UI.image(vertImageGroup, resourcePath + "/Images/vertical_orientation.jpg");
-			// 			var horzImageGroup = UI.group(imgGroup);
-			// 				horzImageGroup.orientation = "column";
-			// 				var horzMsg = UI.static(horzImageGroup, "Horizontal Orientation");
-			// 				var horzImg = UI.image(horzImageGroup, resourcePath + "/Images/horizontal_orientation.jpg");
-			// 		var btnGroup = UI.group(h);
-			// 			var thanks = UI.button(btnGroup,"Thanks",function()
-			// 			{
-			// 				h.close();
-			// 			});
-			// 	h.show();
-			// })
-
 		//group for selection of sizing structure
 		var selectSizeStructureGroup = w.add("panel",undefined,"Select the appropriate sizing format.");
 			selectSizeStructureGroup.orientation = "column";
@@ -111,6 +89,11 @@ function makeDialog()
 				sizeStructureRadioButtons[0].value = true;
 
 
+		//get the rotation information if applicable
+		//some garments need some pieces rotated during the add artwork script
+		//to ensure proper pattern fills and fabric stretch direction etc.
+		//user will input the angle of rotation and the names of the pieces that need
+		//to be rotated. 
 		
 		var rotationGroup = w.add("panel",undefined,"If any pieces need to be rotated, input them here.");
 			var rotTxt = UI.static(rotationGroup,"Enter the rotation angle. Positive numbers are counterclockwise.");
@@ -118,18 +101,21 @@ function makeDialog()
 				rg.orientation = "row";
 				var rotGroup = UI.group(rg);
 					rotGroup.orientation = "column";
-					var rot1 = UI.edit(rotGroup,"Rotation in degrees");
-					var rot1 = UI.edit(rotGroup,"Rotation in degrees");
+					var rot1 = rotationGroup.rot1 = UI.edit(rotGroup,"Rotation in degrees");
+					var rot2 = rotationGroup.rot2 = UI.edit(rotGroup,"Rotation in degrees");
 				
 				var pieceGroup = UI.group(rg);
 					pieceGroup.orientation = "column";
-					var piece1 = UI.edit(pieceGroup,"eg. Front, Back, Left Sleeve, Right Sleeve",50);
-					var piece2 = UI.edit(pieceGroup,"eg. Front, Back, Left Sleeve, Right Sleeve",50);
+					var piece1 = rotationGroup.piece1 = UI.edit(pieceGroup,"eg. Front, Back, Left Sleeve, Right Sleeve",50);
+					var piece2 = rotationGroup.piece2 = UI.edit(pieceGroup,"eg. Front, Back, Left Sleeve, Right Sleeve",50);
 
 		var pieceNameGroup = createInputPanel(w,"pieces","piece names");
 		var sizeGroup = createInputPanel(w,"sizes","sizes");
 		var waistSizeGroup = createInputPanel(w,"waist","waist sizes");
 		var artLocGroup = createInputPanel(w,"artLayers","art layers");
+
+
+
 
 		//set the waist size input to disabled until
 		//the user selects variable inseam 
@@ -148,7 +134,7 @@ function makeDialog()
 			var submit = btnGroup.add("button", undefined, "Submit");
 				submit.onClick = function()
 				{
-					if(validate(gcInput.text,pieceNameGroup.input.text,sizeGroup.input.text,waistSizeGroup.input.text,artLocGroup.input.text))
+					if(validate(gcInput.text,pieceNameGroup.input.text,sizeGroup.input.text,waistSizeGroup.input.text,artLocGroup.input.text,rotationGroup))
 					{
 						dialogSuccess = true;
 						w.close();

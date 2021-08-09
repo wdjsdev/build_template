@@ -1,4 +1,4 @@
-function validate(garmentCode,pieces,sizes,waistSizes,artLocs)
+function validate(garmentCode,pieces,sizes,waistSizes,artLocs,rotationGroup)
 {
 	var result = true;
 	var errors = "";
@@ -48,6 +48,9 @@ function validate(garmentCode,pieces,sizes,waistSizes,artLocs)
 	//validate the artwork locations
 	processInputBox(artLocs,"artLayers");
 
+	//validate the rotation instructions
+	processRotationInput();
+
 
 	//display errors if any
 	if(errors != "")
@@ -86,5 +89,32 @@ function validate(garmentCode,pieces,sizes,waistSizes,artLocs)
 		
 		config[label] = newArray;
 	}
+
+	function processRotationInput()
+	{
+		var result = [];
+
+		var curRot = Number(rotationGroup.rot1.text);
+		var curPieces = rotationGroup.piece1.text.replace(rmSpacesPat,",");
+		curPieces = trimSpaces(curPieces);
+
+		if(curRot && curPieces  && !isNaN(curRot) && curPieces.indexOf("eg. ") === -1)
+		{
+			result.push({"angle":curRot,"pieces":curPieces.replace(rmSpacesPat,",").split(",")})
+		}
+
+		curRot = Number(rotationGroup.rot2.text);
+		curPieces = rotationGroup.piece2.text;
+
+		if(curRot && curPieces  && !isNan(curRot) && curPieces.indexOf("eg. ") === -1)
+		{
+			result.push({"angle":curRot,"pieces":curPieces.split(",")})
+		}
+		if(result.length)
+		{
+			config.rotate = result;
+		}
+	}
+	
 
 }

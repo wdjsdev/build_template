@@ -155,6 +155,18 @@ function logCoords()
 	}
 	if(valid)
 	{
+		if(config.rotate)
+		{
+			//reverse get the inverse rotation values
+			//for add artwork we want to rotate one direction,
+			//but for rebuild template we need to rotate the
+			//opposite direction. the btlibrary database is
+			//used for rebuild template, so let's flip the angles
+			for(var x=0;x<config.rotate.length;x++)
+			{
+				config.rotate[x].angle *= -1;
+			}
+		}
 		config.placement = coord(ppLay);
 		config.createdBy = user;
 		config.createdOn = logTime();
