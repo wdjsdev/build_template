@@ -7,7 +7,7 @@ var MASTER_DEFAULTS =
 	},
 	"sizes":
 	{
-		"overflow":["XS","S","M","L","XL","2XL","3XL","4XL","5XL","WXXS","WXS","WS","WM","WL","WXL","W2XL","W3XL","W4XL","YXS","YS","YM","YL","YXL","Y2XL","GXS","GS","GM","GL","GXL","G2XL"],
+		"overflow":["XS","S","M","L","XL","2XL","3XL","4XL","5XL","YXS","YS","YM","YL","YXL","Y2XL"],
 		"inUse":[]
 	},
 	"waist":

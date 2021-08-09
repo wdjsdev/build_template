@@ -160,6 +160,10 @@ function logAddArtPlacement()
 		{
 			var thisGarInfo = {};
 			additionalInfo = getAdditionalInfo();
+			if(config.rotate)
+			{
+				thisGarInfo.rotate = config.rotate;
+			}
 			thisGarInfo.mockupSize = additionalInfo.mockupSize;
 			thisGarInfo.scaleFrontLogo = additionalInfo.scale;
 			thisGarInfo.placement = aaPlacement;
