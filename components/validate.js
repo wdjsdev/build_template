@@ -72,7 +72,7 @@ function validate(garmentCode,pieces,sizes,waistSizes,artLocs,rotationGroup)
 		
 		txt = txt.replace(rmSpacesPat,",");
 		var newArray = txt.split(",");
-		if(label === "sizes" || label === "waistSizes")
+		if(label === "sizes" || label === "waist")
 		{
 			for(var x=0,len=newArray.length;x<len;x++)
 			{
