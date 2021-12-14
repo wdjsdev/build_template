@@ -113,16 +113,13 @@ function container()
 
 	function getSrcLay()
 	{
-		try
+		tbp = findSpecificLayer(layers,"to be plac","any");
+		if(!tbp)
 		{
-			return layers["To Be Placed"];
-
+			errorList.push("Sorry. You're missing the \"To Be Placed\" layer.\nYou need to copy the CAD to a layer called \"To Be Placed\"");
+			valid = false;
 		}
-		catch(e)
-		{
-			alert("Sorry. You're missing the \"To Be Placed\" layer.\nYou need to copy the CAD to a layer called \"To Be Placed\"");
-			return false;
-		}	
+		return tbp;
 	}
 
 	//setupLayers Function Description
@@ -130,16 +127,6 @@ function container()
 	function setupLayers()
 	{
 		var result = true;
-	
-		try
-		{
-			tbp = layers["To Be Placed"]
-		}
-		catch(e)
-		{
-			result = false;
-			errorList.push("Woops. Looks like you're missing the \"To Be Placed\" layer.\nYou should have the CAD pieces pasted on this layer for this script to work.");
-		}
 
 		if(result)
 		{
@@ -386,75 +373,60 @@ function container()
 	function nameThePieces(sorted)
 	{
 		var localValid = true;
-		try
+		// var prepress = garLay.layers["Prepress"];
+		var prepress = findSpecificLayer(garLay.layers,"prepress","imatch");
+
+		
+		for(var a=0;a<sorted.length;a++)
 		{
-			var prepress = garLay.layers["Prepress"];
-
-
-			//delete any layers that exist on the prepress layer
-			//to avoid having duplicated size layers if the blank
-			//template file had empty size layers in the prepress layer
-			for(var dppl = prepress.layers.length - 1; dppl>=0; dppl--)
-			{
-				prepress.layers[dppl].remove();
-			}
-
+			var thisArray = sorted[a];
+			var theSize = config.sizes[a]
+			var newSizeLayer = prepress.layers.add();
+			newSizeLayer.name = theSize;
+			newSizeLayer.zOrder(ZOrderMethod.SENDTOBACK);
+			var thePieces = config.pieces;
 			
-			for(var a=0;a<sorted.length;a++)
+			//this block for regular garments that follow "XL Front" type sizing structure
+			if(config["waist"] == undefined)
 			{
-				var thisArray = sorted[a];
-				var theSize = config.sizes[a]
-				var newSizeLayer = prepress.layers.add();
-				newSizeLayer.name = theSize;
-				newSizeLayer.zOrder(ZOrderMethod.SENDTOBACK);
-				var thePieces = config.pieces;
-				
-				//this block for regular garments that follow "XL Front" type sizing structure
-				if(config["waist"] == undefined)
+				for(var b=0;b<thisArray.length;b++)
 				{
-					for(var b=0;b<thisArray.length;b++)
+					var thisPieceName = thePieces[b];
+					if(thisPieceName == null)
 					{
-						var thisPieceName = thePieces[b];
-						if(thisPieceName == null)
-						{
-							alert("Something's not grouped properly for the size: " + theSize);
-						}
-						var thisPiece = thisArray[b];
-						thisPiece.name = theSize + " " + thisPieceName;
-						thisPiece.moveToBeginning(newSizeLayer);
-
+						alert("Something's not grouped properly for the size: " + theSize);
 					}
+					var thisPiece = thisArray[b];
+					thisPiece.name = theSize + " " + thisPieceName;
+					thisPiece.moveToBeginning(newSizeLayer);
+
 				}
+			}
 
-				//this block for pants that use "30W x 26I" (waist x inseam) sizing structure
-				else
+			//this block for pants that use "30W x 26I" (waist x inseam) sizing structure
+			else
+			{
+				var waistCounter = 0;
+				var pieceCounter = 0;
+				for(var b=0;b<thisArray.length;b++)
 				{
-					var waistCounter = 0;
-					var pieceCounter = 0;
-					for(var b=0;b<thisArray.length;b++)
-					{
-						var thisPiece = thisArray[b];
-						var thisPieceName = config["pieces"][pieceCounter];
-						thisPiece.name = config["waist"][waistCounter] + "x" + theSize + " " + thisPieceName;
-						thisPiece.moveToBeginning(newSizeLayer);
+					var thisPiece = thisArray[b];
+					var thisPieceName = config["pieces"][pieceCounter];
+					thisPiece.name = config["waist"][waistCounter] + "x" + theSize + " " + thisPieceName;
+					thisPiece.moveToBeginning(newSizeLayer);
 
-						//increment or reset pieceCounter
-						if(pieceCounter < config["pieces"].length -1)
-						{
-							pieceCounter++;
-						}
-						else
-						{
-							pieceCounter = 0;
-							waistCounter++;
-						}
+					//increment or reset pieceCounter
+					if(pieceCounter < config["pieces"].length -1)
+					{
+						pieceCounter++;
+					}
+					else
+					{
+						pieceCounter = 0;
+						waistCounter++;
 					}
 				}
 			}
-		}
-		catch(e)
-		{
-			localValid = false;
 		}
 		return localValid;
 	}
@@ -462,36 +434,22 @@ function container()
 	function moveThePieces(layers)
 	{
 		var localValid = true;
-		try
+		var curLay;
+		var curSize;
+		for(var a=0;a<layers.length;a++)
 		{
-			var curLay;
-			var curSize;
-			for(var a=0;a<layers.length;a++)
+			curLay = layers[a];
+			curSize = curLay.name;
+			var curPiece;
+			var coords;
+			for(var b=0;b<curLay.groupItems.length;b++)
 			{
-				curLay = layers[a];
-				curSize = curLay.name;
-				var curPiece;
-				var coords;
-				for(var b=0;b<curLay.groupItems.length;b++)
-				{
-					curPiece = curLay.groupItems[b];
-					coords = config.placement[curSize][curPiece.name];
-					
-					//the below is deprecdated in favor of using the special_instructions database
-					//to determine specific rotation for specific pieces.
-					// if(curPiece.name.indexOf("Outside Cowl")>-1 || curPiece.name.indexOf("Outside Yoke") > -1)
-					// {
-					// 	curPiece.rotate(180);
-					// }
-					curPiece.left = coords[0];
-					curPiece.top = coords[1];
-				}
+				curPiece = curLay.groupItems[b];
+				coords = config.placement[curSize][curPiece.name];
+				
+				curPiece.left = coords[0];
+				curPiece.top = coords[1];
 			}
-		}
-		catch(e)
-		{
-			errorList.push("Failed while moving the pieces.");
-			localValid = false;
 		}
 		return localValid;
 	}
@@ -529,25 +487,12 @@ function container()
 			artLay.layers[0].remove();
 		}
 
-		try
+		var reversed = config.artLayers.reverse();
+		var newLay;
+		for(var x=0,len=reversed.length;x<len;x++)
 		{
-			var reversed = config.artLayers.reverse();
-			var newLay;
-			// for each(lay in reversed)
-			// {
-			// 	var newLay = artLay.layers.add();
-			// 	newLay.name = lay;
-
-			// }
-			for(var x=0,len=reversed.length;x<len;x++)
-			{
-				newLay = artLay.layers.add();
-				newLay.name = reversed[x];
-			}
-		}
-		catch(e)
-		{
-			localValid = false;
+			newLay = artLay.layers.add();
+			newLay.name = reversed[x];
 		}
 		return localValid;
 	}
@@ -555,31 +500,28 @@ function container()
 	function cleanUp()
 	{
 		var localValid = true;
-		try
+		var styleNum = prompt("Enter 4 digit style number", "1013");
+
+		var garmentCodeFrame = findSpecificPageItem(infoLay,"garment code","imatch");
+		var garmentCode2Frame = findSpecificPageItem(infoLay,"garment code 2","imatch");
+		
+		if(!garmentCodeFrame)
 		{
-			
-			var styleNum = prompt("Enter 4 digit style number", "1013");
-
-			infoLay.textFrames["Garment Code"].contents = config.garmentCode + "_" + styleNum;
-
-			//check for existence of "Garment Code 2" textFrame. if true, repeat last line to add styleNum
-			try
-			{
-				infoLay.textFrames["Garment Code 2"].contents = config.garmentCode + "_" + styleNum;
-			}
-			catch(e)
-			{
-				//no garment code 2 text frame exists.. carry on
-			}
-
-			layers["To Be Placed"].remove();
-			garLay.name = code + "_" + styleNum;
-
+			errorList.push("Failed to find the \"Garment Code\" text on the info layer.");
 		}
-		catch(e)
+		else
 		{
-			localValid = false;
+			garmentCodeFrame.contents = config.garmentCode + "_" + styleNum;
 		}
+
+		//check for existence of "Garment Code 2" textFrame. if true, repeat last line to add styleNum
+		if(garmentCode2Frame)
+		{
+			garmentCode2Frame.contents = config.garmentCode + "_" + styleNum;
+		}
+
+		layers["To Be Placed"].remove();
+		garLay.name = code + "_" + styleNum;
 		return localValid;
 	}
 
@@ -634,8 +576,16 @@ function container()
 
 	if(valid)
 	{
-		unlockDoc(docRef);
+		unlockDoc(docRef);	
+	}
+
+	if(valid)
+	{
 		srcLay = getSrcLay();
+	}
+
+	if(valid)
+	{
 		valid = setupLayers();
 	}
 
