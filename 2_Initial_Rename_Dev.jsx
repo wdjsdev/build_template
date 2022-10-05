@@ -19,7 +19,7 @@ function initialRename()
 			devUtilitiesPreferenceFile.open("r");
 			var prefContents = devUtilitiesPreferenceFile.read();
 			devUtilitiesPreferenceFile.close();
-			if(prefContents === "true")
+			if(prefContents.match(/true/i))
 			{
 				utilPath = "~/Desktop/automation/utilities/";
 				ext = ".js";
@@ -319,84 +319,80 @@ function initialRename()
 
 	function nameThePieces(sorted)
 	{
-		try
+		var garLay = layers[1];
+		garLay.locked = false;
+		garLay.visible = true;
+		var prepress = findSpecificLayer(garLay,"Prepress");
+		if(!prepress)
 		{
-			var garLay = layers[1];
-			garLay.locked = false;
-			garLay.visible = true;
-			var prepress = garLay.layers["Prepress"];
-			prepress.locked = false;
-			prepress.visible = true;
-
-			//delete any layers that exist on the prepress layer
-			//to avoid having duplicated size layers if the blank
-			//template file had empty size layers in the prepress layer
-			for(var dppl = prepress.layers.length - 1; dppl>=0; dppl--)
-			{
-				prepress.layers[dppl].remove();
-			}
-			
-			for(var a=0;a<sorted.length;a++)
-			{
-				var thisArray = sorted[a];
-				var theSize = config.sizes[a]
-				var newSizeLayer = prepress.layers.add();
-				newSizeLayer.name = theSize;
-				newSizeLayer.zOrder(ZOrderMethod.SENDTOBACK);
-				var thePieces = config.pieces;
-				
-				//this block for regular garments that follow "XL Front" type sizing structure
-				if(config["waist"] == undefined)
-				{
-					for(var b=0;b<thisArray.length;b++)
-					{
-						var thisPieceName = thePieces[b];
-						if(thisPieceName == null)
-						{
-							alert("Something's not grouped properly for the size: " + theSize);
-						}
-						var thisPiece = thisArray[b];
-						thisPiece.name = theSize + " " + thisPieceName;
-						thisPiece.moveToBeginning(newSizeLayer);
-
-					}
-				}
-
-				//this block for pants that use "30W x 26I" (waist x inseam) sizing structure
-				else
-				{
-					var waistCounter = 0;
-					var pieceCounter = 0;
-					for(var b=0;b<thisArray.length;b++)
-					{
-						var thisPiece = thisArray[b];
-						var thisPieceName = config["pieces"][pieceCounter];
-						thisPiece.name = config["waist"][waistCounter] + "x" + theSize + " " + thisPieceName;
-						thisPiece.moveToBeginning(newSizeLayer);
-
-						//increment or reset pieceCounter
-						// if(pieceCounter < 7)
-						// {
-						// 	pieceCounter++;
-						// }
-						if(pieceCounter < config["pieces"].length -1)
-						{
-							pieceCounter++;
-						}
-						else
-						{
-							pieceCounter = 0;
-							waistCounter++;
-						}
-					}
-				}
-			}
+			prepress = garLay.layers.add();
+			prepress.name = "Prepress";
 		}
-		catch(e)
+		prepress.locked = false;
+		prepress.visible = true;
+
+		//delete any layers that exist on the prepress layer
+		//to avoid having duplicated size layers if the blank
+		//template file had empty size layers in the prepress layer
+		for(var dppl = prepress.layers.length - 1; dppl>=0; dppl--)
 		{
-			alert("failed while naming the pieces\nSystem Error message = " + e);
-			valid = false;
-			return;
+			prepress.layers[dppl].remove();
+		}
+		
+		for(var a=0;a<sorted.length;a++)
+		{
+			var thisArray = sorted[a];
+			var theSize = config.sizes[a]
+			var newSizeLayer = prepress.layers.add();
+			newSizeLayer.name = theSize;
+			newSizeLayer.zOrder(ZOrderMethod.SENDTOBACK);
+			var thePieces = config.pieces;
+			
+			//this block for regular garments that follow "XL Front" type sizing structure
+			if(config["waist"] == undefined)
+			{
+				for(var b=0;b<thisArray.length;b++)
+				{
+					var thisPieceName = thePieces[b];
+					if(thisPieceName == null)
+					{
+						alert("Something's not grouped properly for the size: " + theSize);
+					}
+					var thisPiece = thisArray[b];
+					thisPiece.name = theSize + " " + thisPieceName;
+					thisPiece.moveToBeginning(newSizeLayer);
+
+				}
+			}
+
+			//this block for pants that use "30W x 26I" (waist x inseam) sizing structure
+			else
+			{
+				var waistCounter = 0;
+				var pieceCounter = 0;
+				for(var b=0;b<thisArray.length;b++)
+				{
+					var thisPiece = thisArray[b];
+					var thisPieceName = config["pieces"][pieceCounter];
+					thisPiece.name = config["waist"][waistCounter] + "x" + theSize + " " + thisPieceName;
+					thisPiece.moveToBeginning(newSizeLayer);
+
+					//increment or reset pieceCounter
+					// if(pieceCounter < 7)
+					// {
+					// 	pieceCounter++;
+					// }
+					if(pieceCounter < config["pieces"].length -1)
+					{
+						pieceCounter++;
+					}
+					else
+					{
+						pieceCounter = 0;
+						waistCounter++;
+					}
+				}
+			}
 		}
 	}
 

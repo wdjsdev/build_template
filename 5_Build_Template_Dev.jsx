@@ -131,10 +131,10 @@ function container()
 		if(result)
 		{
 			garLay = layers[1];
-			ppLay = garLay.layers["Prepress"];
-			infoLay = garLay.layers["Information"];
-			artLay = garLay.layers["Artwork Layer"];
-			mockLay = garLay.layers["Mockup"];
+			ppLay = findSpecificLayer(garLay,"Prepress","any");
+			infoLay = findSpecificLayer(garLay,"Information","any");
+			artLay = findSpecificLayer(garLay,"Artwork","any");
+			mockLay = findSpecificLayer(garLay,"Mockup","any");
 		}
 	
 		return result;
