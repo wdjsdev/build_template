@@ -17,87 +17,84 @@
 */
 
 #target Illustrator
-function buildConfig()
+function buildConfig ()
 {
 	var valid = true;
 	var scriptName = "build_template_config";
 
-	function getUtilities()
+	function getUtilities ()
 	{
-		var result = [];
-		var utilPath = "/Volumes/Customization/Library/Scripts/Script_Resources/Data/";
-		var ext = ".jsxbin"
-
-		//check for dev utilities preference file
-		var devUtilitiesPreferenceFile = File("~/Documents/script_preferences/dev_utilities.txt");
-
-		if(devUtilitiesPreferenceFile.exists)
+		var utilNames = [ "Utilities_Container" ]; //array of util names
+		var utilFiles = []; //array of util files
+		//check for dev mode
+		var devUtilitiesPreferenceFile = File( "~/Documents/script_preferences/dev_utilities.txt" );
+		function readDevPref ( dp ) { dp.open( "r" ); var contents = dp.read() || ""; dp.close(); return contents; }
+		if ( devUtilitiesPreferenceFile.exists && readDevPref( devUtilitiesPreferenceFile ).match( /true/i ) )
 		{
-			devUtilitiesPreferenceFile.open("r");
-			var prefContents = devUtilitiesPreferenceFile.read();
-			devUtilitiesPreferenceFile.close();
-			if(prefContents === "true")
+			$.writeln( "///////\n////////\nUsing dev utilities\n///////\n////////" );
+			var devUtilPath = "~/Desktop/automation/utilities/";
+			utilFiles = [ devUtilPath + "Utilities_Container.js", devUtilPath + "Batch_Framework.js" ];
+			return utilFiles;
+		}
+
+		var dataResourcePath = customizationPath + "Library/Scripts/Script_Resources/Data/";
+
+		for ( var u = 0; u < utilNames.length; u++ )
+		{
+			var utilFile = new File( dataResourcePath + utilNames[ u ] + ".jsxbin" );
+			if ( utilFile.exists )
 			{
-				utilPath = "~/Desktop/automation/utilities/";
-				ext = ".js";
+				utilFiles.push( utilFile );
 			}
+
 		}
 
-		if($.os.match("Windows"))
+		if ( !utilFiles.length )
 		{
-			utilPath = utilPath.replace("/Volumes/","//AD4/");
+			alert( "Could not find utilities. Please ensure you're connected to the appropriate Customization drive." );
+			return [];
 		}
 
-		result.push(utilPath + "Utilities_Container" + ext);
-		result.push(utilPath + "Batch_Framework" + ext);
 
-		if(!result.length)
-		{
-			valid = false;
-			alert("Failed to find the utilities.");
-		}
-		return result;
+		return utilFiles;
 
 	}
-
 	var utilities = getUtilities();
-	for(var u=0,len=utilities.length;u<len;u++)
+
+	for ( var u = 0, len = utilities.length; u < len && valid; u++ )
 	{
-		eval("#include \"" + utilities[u] + "\"");	
+		eval( "#include \"" + utilities[ u ] + "\"" );
 	}
 
-	if(!valid)return;
+	if ( !valid || !utilities.length ) return;
 
-	if(user === "will.dowling")
-	{
-		DEV_LOGGING = true;
-	}
+	DEV_LOGGING = user === "will.dowling";
 
 
 	/*****************************************************************************/
 	//==============================  Components  ===============================//
 
-	logDest.push(getLogDest());
+	logDest.push( getLogDest() );
 
 	var devComponents = desktopPath + "automation/build_template/components";
 	var prodComponents = componentsPath + "build_template";
-	var compPath = $.fileName.indexOf("_Dev") > -1 ? devComponents : prodComponents;
+	var compPath = $.fileName.indexOf( "_Dev" ) > -1 ? devComponents : prodComponents;
 
 	// var compFiles = includeComponents(devComponents,prodComponents,true);
-	var compFiles = getComponents(compPath);
+	var compFiles = getComponents( compPath );
 
-	if(compFiles && compFiles.length)
+	if ( compFiles && compFiles.length )
 	{
-		for(var x=0,len=compFiles.length;x<len;x++)
+		for ( var x = 0, len = compFiles.length; x < len; x++ )
 		{
 			try
 			{
-				eval("#include \"" + compFiles[x].fullName + "\"");
+				eval( "#include \"" + compFiles[ x ].fullName + "\"" );
 			}
-			catch(e)
+			catch ( e )
 			{
-				errorList.push("Failed to include the component: " + compFiles[x].name);
-				log.e("Failed to include the component: " + compFiles[x].name + "::System Error Message: " + e + "::System Error Line: " + e.line);
+				errorList.push( "Failed to include the component: " + compFiles[ x ].name );
+				log.e( "Failed to include the component: " + compFiles[ x ].name + "::System Error Message: " + e + "::System Error Line: " + e.line );
 				valid = false;
 			}
 		}
@@ -105,8 +102,8 @@ function buildConfig()
 	else
 	{
 		valid = false;
-		errorList.push("Failed to find any of the necessary components for this script to work.");
-		log.e("Failed to include any components. Exiting script.");
+		errorList.push( "Failed to find any of the necessary components for this script to work." );
+		log.e( "Failed to include any components. Exiting script." );
 	}
 
 	//=============================  /Components  ===============================//
@@ -122,8 +119,8 @@ function buildConfig()
 	//if personal defaults go haywire.
 
 	var defaultFilesPath = documentsPath + "build_template_defaults/"
-	var defaultFileFolder = Folder(defaultFilesPath);
-	if(!defaultFileFolder.exists)
+	var defaultFileFolder = Folder( defaultFilesPath );
+	if ( !defaultFileFolder.exists )
 	{
 		defaultFileFolder.create();
 	}
@@ -131,54 +128,54 @@ function buildConfig()
 	//check to see whether the folder still doesn't exist..
 	//if so, then likely there's an issue with naming of the
 	//main hard drive?
-	if(!defaultFileFolder.exists)
+	if ( !defaultFileFolder.exists )
 	{
 		defaultFilesPath = "~/Documents/build_template_defaults/";
-		defaultFileFolder = Folder(defaultFilesPath);
+		defaultFileFolder = Folder( defaultFilesPath );
 		defaultFileFolder.create();
 	}
 
-	
+
 
 	var userDefaults = {
-		"pieces": 
+		"pieces":
 		{
-			"overflow":[],
-			"inUse":[],
-			"file":File(defaultFilesPath + "build_template_default_piece_names.js")
+			"overflow": [],
+			"inUse": [],
+			"file": File( defaultFilesPath + "build_template_default_piece_names.js" )
 		},
 		"sizes":
 		{
-			"overflow":[],
-			"inUse":[],
-			"file":File(defaultFilesPath + "build_template_default_sizes.js")
+			"overflow": [],
+			"inUse": [],
+			"file": File( defaultFilesPath + "build_template_default_sizes.js" )
 		},
 		"waist":
 		{
-			"overflow":[],
-			"inUse":[],
-			"file":File(defaultFilesPath + "build_template_default_waist_sizes.js")	
+			"overflow": [],
+			"inUse": [],
+			"file": File( defaultFilesPath + "build_template_default_waist_sizes.js" )
 		},
 		"artLayers":
 		{
-			"overflow":[],
-			"inUse":[],
-			"file":File(defaultFilesPath + "build_template_default_locations.js")
+			"overflow": [],
+			"inUse": [],
+			"file": File( defaultFilesPath + "build_template_default_locations.js" )
 		}
 	}
 
-	for(var list in userDefaults)
+	for ( var list in userDefaults )
 	{
-		if(!userDefaults[list].file.exists)
+		if ( !userDefaults[ list ].file.exists )
 		{
-			writeDefaultFile(userDefaults[list].file,MASTER_DEFAULTS[list].inUse,MASTER_DEFAULTS[list].overflow);
+			writeDefaultFile( userDefaults[ list ].file, MASTER_DEFAULTS[ list ].inUse, MASTER_DEFAULTS[ list ].overflow );
 		}
-		eval("#include \"" + userDefaults[list].file.fullName + "\"");
-		userDefaults[list].inUse = inUse;
-		userDefaults[list].overflow = overflow;
+		eval( "#include \"" + userDefaults[ list ].file.fullName + "\"" );
+		userDefaults[ list ].inUse = inUse;
+		userDefaults[ list ].overflow = overflow;
 	}
 
-	
+
 
 	//boolean variable to keep track of whether the
 	//sizing structure contains variable inseam sizing
@@ -189,40 +186,40 @@ function buildConfig()
 	var cadOrientation = "vertical";
 
 	var configFileLoc = documentsPath + "build_template_config/";
-	if(!Folder(configFileLoc).exists)
+	if ( !Folder( configFileLoc ).exists )
 	{
-		Folder(configFileLoc).create();
+		Folder( configFileLoc ).create();
 	}
 
 
 
 	//try to import the 
 	var configFilePath = configFileLoc + "btconfig.js"
-	var configFile = new File(configFilePath);
+	var configFile = new File( configFilePath );
 
-	if(configFile.exists)
+	if ( configFile.exists )
 	{
-		eval("#include \"" + configFilePath + "\"");
+		eval( "#include \"" + configFilePath + "\"" );
 	}
 	else
 	{
 		var config =
 		{
-			"garmentCode":"",
-			"orientation":"",
-			"pieces":[],
-			"sizes":[],
-			"waist":undefined,
-			"artLayers":[]
-		}	
+			"garmentCode": "",
+			"orientation": "",
+			"pieces": [],
+			"sizes": [],
+			"waist": undefined,
+			"artLayers": []
+		}
 	}
-	
 
-	var sizingStructures = ["Regular Sizing", "Pants Sizing", "Varying Inseams"];
 
-	if(valid && makeDialog())
+	var sizingStructures = [ "Regular Sizing", "Pants Sizing", "Varying Inseams" ];
+
+	if ( valid && makeDialog() )
 	{
-		writeConfigFile(config);
+		writeConfigFile( config );
 	}
 
 

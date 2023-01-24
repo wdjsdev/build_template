@@ -16,60 +16,62 @@ Progress:
 */
 
 #target Illustrator
-function container()
+function container ()
 {
 
 	var valid = true;
 	var scriptName = "build_template";
 
-	function getUtilities()
+	function getUtilities ()
 	{
-		var result = [];
-		var utilPath = "/Volumes/Customization/Library/Scripts/Script_Resources/Data/";
-		var ext = ".jsxbin"
-
-		//check for dev utilities preference file
-		var devUtilitiesPreferenceFile = File("~/Documents/script_preferences/dev_utilities.txt");
-
-		if(devUtilitiesPreferenceFile.exists)
+		var utilNames = [ "Utilities_Container" ]; //array of util names
+		var utilFiles = []; //array of util files
+		//check for dev mode
+		var devUtilitiesPreferenceFile = File( "~/Documents/script_preferences/dev_utilities.txt" );
+		function readDevPref ( dp ) { dp.open( "r" ); var contents = dp.read() || ""; dp.close(); return contents; }
+		if ( devUtilitiesPreferenceFile.exists && readDevPref( devUtilitiesPreferenceFile ).match( /true/i ) )
 		{
-			devUtilitiesPreferenceFile.open("r");
-			var prefContents = devUtilitiesPreferenceFile.read();
-			devUtilitiesPreferenceFile.close();
-			if(prefContents === "true")
+			$.writeln( "///////\n////////\nUsing dev utilities\n///////\n////////" );
+			var devUtilPath = "~/Desktop/automation/utilities/";
+			utilFiles = [ devUtilPath + "Utilities_Container.js", devUtilPath + "Batch_Framework.js" ];
+			return utilFiles;
+		}
+
+		var dataResourcePath = customizationPath + "Library/Scripts/Script_Resources/Data/";
+
+		for ( var u = 0; u < utilNames.length; u++ )
+		{
+			var utilFile = new File( dataResourcePath + utilNames[ u ] + ".jsxbin" );
+			if ( utilFile.exists )
 			{
-				utilPath = "~/Desktop/automation/utilities/";
-				ext = ".js";
+				utilFiles.push( utilFile );
 			}
+
 		}
 
-		if($.os.match("Windows"))
+		if ( !utilFiles.length )
 		{
-			utilPath = utilPath.replace("/Volumes/","//AD4/");
+			alert( "Could not find utilities. Please ensure you're connected to the appropriate Customization drive." );
+			return [];
 		}
 
-		result.push(utilPath + "Utilities_Container" + ext);
-		result.push(utilPath + "Batch_Framework" + ext);
 
-		if(!result.length)
-		{
-			valid = false;
-			alert("Failed to find the utilities.");
-		}
-		return result;
+		return utilFiles;
 
 	}
-
 	var utilities = getUtilities();
-	for(var u=0,len=utilities.length;u<len;u++)
+
+	for ( var u = 0, len = utilities.length; u < len && valid; u++ )
 	{
-		eval("#include \"" + utilities[u] + "\"");	
+		eval( "#include \"" + utilities[ u ] + "\"" );
 	}
 
-	if(!valid)return;
+	if ( !valid || !utilities.length ) return;
+
+	DEV_LOGGING = user === "will.dowling";
 
 
-	if(!valid)
+	if ( !valid )
 	{
 		return;
 	}
@@ -83,26 +85,26 @@ function container()
 
 	//sendErrors Function Description
 	//Display any errors to the user in a preformatted list
-	function sendErrors(errorList)
+	function sendErrors ( errorList )
 	{
-		alert(errorList.join("\n"));
+		alert( errorList.join( "\n" ) );
 	}
 
-	function readConfig(code)
+	function readConfig ( code )
 	{
 		var btLib = btLibraryFile;
 
-		eval("#include \"" + btLibraryPath + "\"");
+		eval( "#include \"" + btLibraryPath + "\"" );
 
-		if(!templateInfo[code])
+		if ( !templateInfo[ code ] )
 		{
-			alert("No entry was found in the database for " + code + ".");
+			alert( "No entry was found in the database for " + code + "." );
 			return false;
 		}
 		else
 		{
-			config = templateInfo[code];
-			if(!config.garmentCode)
+			config = templateInfo[ code ];
+			if ( !config.garmentCode )
 			{
 				config.garmentCode = code;
 			}
@@ -111,12 +113,12 @@ function container()
 		return config;
 	}
 
-	function getSrcLay()
+	function getSrcLay ()
 	{
-		tbp = findSpecificLayer(layers,"to be plac","any");
-		if(!tbp)
+		tbp = findSpecificLayer( layers, "to be plac", "any" );
+		if ( !tbp )
 		{
-			errorList.push("Sorry. You're missing the \"To Be Placed\" layer.\nYou need to copy the CAD to a layer called \"To Be Placed\"");
+			errorList.push( "Sorry. You're missing the \"To Be Placed\" layer.\nYou need to copy the CAD to a layer called \"To Be Placed\"" );
 			valid = false;
 		}
 		return tbp;
@@ -124,19 +126,19 @@ function container()
 
 	//setupLayers Function Description
 	//check for, validate, and save important layers to global variables
-	function setupLayers()
+	function setupLayers ()
 	{
 		var result = true;
 
-		if(result)
+		if ( result )
 		{
-			garLay = layers[1];
-			ppLay = findSpecificLayer(garLay,"Prepress","any");
-			infoLay = findSpecificLayer(garLay,"Information","any");
-			artLay = findSpecificLayer(garLay,"Artwork","any");
-			mockLay = findSpecificLayer(garLay,"Mockup","any");
+			garLay = layers[ 1 ];
+			ppLay = findSpecificLayer( garLay, "Prepress", "any" );
+			infoLay = findSpecificLayer( garLay, "Information", "any" );
+			artLay = findSpecificLayer( garLay, "Artwork", "any" );
+			mockLay = findSpecificLayer( garLay, "Mockup", "any" );
 		}
-	
+
 		return result;
 	}
 
@@ -146,20 +148,20 @@ function container()
 	//Then sort each row from left to right
 	//groups = array of groups
 	//count = number of pieces per garment (ie. slowpitch would be 5. front, back, left sleeve, right sleeve, collar)
-	function sortPieces(groups)
+	function sortPieces ( groups )
 	{
 		var valid;
 		//create array of pieces
 		var pieces = [];
-		for(var x=0;x<groups.length;x++)
+		for ( var x = 0; x < groups.length; x++ )
 		{
-			var thisPiece = groups[x];
-			pieces.push(thisPiece);
+			var thisPiece = groups[ x ];
+			pieces.push( thisPiece );
 		}
 
-		if(pieces.length == 0)
+		if ( pieces.length == 0 )
 		{
-			alert("There's no art on the To Be Placed layer!");
+			alert( "There's no art on the To Be Placed layer!" );
 			return false;
 		}
 
@@ -168,7 +170,7 @@ function container()
 		var sizeCount = config.sizes.length;
 		var pieceCount = config.pieces.length;
 
-		if(!config.waist)
+		if ( !config.waist )
 		{
 			var correctCount = sizeCount * pieceCount;
 		}
@@ -177,16 +179,16 @@ function container()
 			var correctCount = sizeCount * config.waist.length * pieceCount;
 		}
 
-		if(pieces.length != correctCount)
+		if ( pieces.length != correctCount )
 		{
 			valid = false;
-			alert("There are " + pieces.length + " groups on the TBP layer.\nThere should be " + correctCount);
+			alert( "There are " + pieces.length + " groups on the TBP layer.\nThere should be " + correctCount );
 			return valid;
 		}
-		else if(srcLay.pathItems.length > 0 || srcLay.textFrames.length > 0 || srcLay.compoundPathItems.length > 0)
+		else if ( srcLay.pathItems.length > 0 || srcLay.textFrames.length > 0 || srcLay.compoundPathItems.length > 0 )
 		{
 			valid = false;
-			alert("Invalid items!\nTBP.pathItems.length = " + srcLay.pathItems.length + "\nTBP.textFrames.length = " + srcLay.textFrames.length + "\nTBP.compoundPathItems.length = " + srcLay.compoundPathItems.length);
+			alert( "Invalid items!\nTBP.pathItems.length = " + srcLay.pathItems.length + "\nTBP.textFrames.length = " + srcLay.textFrames.length + "\nTBP.compoundPathItems.length = " + srcLay.compoundPathItems.length );
 			return valid;
 		}
 
@@ -196,7 +198,7 @@ function container()
 
 		var rowLength;
 		var rowLengthCopy;
-		if(config.waist)
+		if ( config.waist )
 		{
 			rowLength = rowLengthCopy = pieceCount * config.waist.length;
 		}
@@ -206,29 +208,29 @@ function container()
 		}
 
 
-		if(config.orientation == "horizontal")
+		if ( config.orientation == "horizontal" )
 		{
 			//loop all the pieces to find the leftmost piece
 			//push leftMost to verticalSorted array
 			//splice leftMost from pieces and repeat until pieces.length == 0
-			while(pieces.length>0)
+			while ( pieces.length > 0 )
 			{
 				var deleteIndex = 0;
-				var leftMost = pieces[0];
+				var leftMost = pieces[ 0 ];
 				var left = leftMost.left;
 
-				for(var x = pieces.length-1;x >0; x--)
+				for ( var x = pieces.length - 1; x > 0; x-- )
 				{
-					var thisPiece = pieces[x];
-					if(thisPiece.left <= left)
+					var thisPiece = pieces[ x ];
+					if ( thisPiece.left <= left )
 					{
 						leftMost = thisPiece;
 						left = thisPiece.left;
 						deleteIndex = x;
 					}
 				}
-				verticalSorted.push(leftMost);
-				pieces.splice(deleteIndex,1);
+				verticalSorted.push( leftMost );
+				pieces.splice( deleteIndex, 1 );
 
 			}
 		}
@@ -237,24 +239,24 @@ function container()
 			//loop all the pieces to find the topmost piece
 			//push topMost to verticalSorted array
 			//splice topMost from pieces and repeat until pieces.length == 0
-			while(pieces.length>0)
+			while ( pieces.length > 0 )
 			{
 				var deleteIndex = 0;
-				var topMost = pieces[0];
+				var topMost = pieces[ 0 ];
 				var top = topMost.top;
 
-				for(var x = pieces.length - 1;x >0; x--)
+				for ( var x = pieces.length - 1; x > 0; x-- )
 				{
-					var thisPiece = pieces[x];
-					if(thisPiece.top >= top)
+					var thisPiece = pieces[ x ];
+					if ( thisPiece.top >= top )
 					{
 						topMost = thisPiece;
 						top = thisPiece.top;
 						deleteIndex = x;
 					}
 				}
-				verticalSorted.push(topMost);
-				pieces.splice(deleteIndex,1);
+				verticalSorted.push( topMost );
+				pieces.splice( deleteIndex, 1 );
 				rowLength--;
 
 			}
@@ -267,101 +269,101 @@ function container()
 		//this will all of pieces for a given size.
 		//for example, if there are 5 pieces necessary for a garment, it will pull the next 5 pieces from the verticalSorted array
 		//and push them into the temp array so they can be sorted from left to right.
-		for(var a=0;a<sizeCount;a++)
+		for ( var a = 0; a < sizeCount; a++ )
 		{
 			var temp = [];
-			var tempSorted =[];
-			
-			for(var b=0;b<rowLength;b++)
-			{
-				temp.push(verticalSorted[b]);
-			}
-			verticalSorted.splice(0,rowLength);
+			var tempSorted = [];
 
-			
-			while(temp.length>0)
+			for ( var b = 0; b < rowLength; b++ )
 			{
-				var leftMost = temp[0];
+				temp.push( verticalSorted[ b ] );
+			}
+			verticalSorted.splice( 0, rowLength );
+
+
+			while ( temp.length > 0 )
+			{
+				var leftMost = temp[ 0 ];
 				var left = leftMost.left;
-				var deleteIndex = 0; 
-				for(var b=0;b<temp.length;b++)
+				var deleteIndex = 0;
+				for ( var b = 0; b < temp.length; b++ )
 				{
-					var thisPiece = temp[b];
-					if(thisPiece.left <= left)
+					var thisPiece = temp[ b ];
+					if ( thisPiece.left <= left )
 					{
 						leftMost = thisPiece;
 						left = thisPiece.left;
 						deleteIndex = b;
 					}
 				}
-				tempSorted.push(leftMost);
-				temp.splice(deleteIndex,1);
+				tempSorted.push( leftMost );
+				temp.splice( deleteIndex, 1 );
 			}
 
-			finalSorted.push(sortVert(tempSorted));
-				
+			finalSorted.push( sortVert( tempSorted ) );
+
 		}
-		
+
 
 
 		return finalSorted;
 	}
 
-	function sortVert(thisRow)
+	function sortVert ( thisRow )
 	{
 		var finishedSorting = [];
-		var sortVertBuffer =10;
+		var sortVertBuffer = 10;
 
-		if(thisRow.length==1)
+		if ( thisRow.length == 1 )
 		{
-			finishedSorting.push(thisRow[0]);
+			finishedSorting.push( thisRow[ 0 ] );
 			return finishedSorting;
 		}
-		while(thisRow.length>0)
+		while ( thisRow.length > 0 )
 		{
 			var sharedLefts = [];
 			var shared = false;
-			var curLeft = thisRow[0].left;
-			for(var a=thisRow.length-1;a>0;a--)
+			var curLeft = thisRow[ 0 ].left;
+			for ( var a = thisRow.length - 1; a > 0; a-- )
 			{
-				var thisGroup = thisRow[a];
+				var thisGroup = thisRow[ a ];
 
-				if(thisGroup.left + sortVertBuffer > curLeft && thisGroup.left - sortVertBuffer < curLeft)
+				if ( thisGroup.left + sortVertBuffer > curLeft && thisGroup.left - sortVertBuffer < curLeft )
 				{
 					//this group and thisRow[0] share a left coordinate
-					sharedLefts.push(thisGroup)
+					sharedLefts.push( thisGroup )
 					shared = true;
-					thisRow.splice(a,1);
+					thisRow.splice( a, 1 );
 				}
 			}
-			
-			if(!shared)
+
+			if ( !shared )
 			{
-				finishedSorting.push(thisRow[0])
-				thisRow.splice(0,1);
+				finishedSorting.push( thisRow[ 0 ] )
+				thisRow.splice( 0, 1 );
 			}
 			else
 			{
-				sharedLefts.push(thisRow[0]);
-				thisRow.splice(0,1);
+				sharedLefts.push( thisRow[ 0 ] );
+				thisRow.splice( 0, 1 );
 
-				while(sharedLefts.length>0)
+				while ( sharedLefts.length > 0 )
 				{
-					var top = sharedLefts[0].top;
-					var topMost = sharedLefts[0];
+					var top = sharedLefts[ 0 ].top;
+					var topMost = sharedLefts[ 0 ];
 					var di = 0;
-					for(var t = 1;t <sharedLefts.length; t++)
+					for ( var t = 1; t < sharedLefts.length; t++ )
 					{
-						var thisGroup = sharedLefts[t];
-						if(thisGroup.top > top)
+						var thisGroup = sharedLefts[ t ];
+						if ( thisGroup.top > top )
 						{
 							top = thisGroup.top;
 							topMost = thisGroup;
 							di = t;
 						}
 					}
-					finishedSorting.push(topMost);
-					sharedLefts.splice(di,1);
+					finishedSorting.push( topMost );
+					sharedLefts.splice( di, 1 );
 				}
 
 			}
@@ -370,35 +372,35 @@ function container()
 		return finishedSorting;
 	}
 
-	function nameThePieces(sorted)
+	function nameThePieces ( sorted )
 	{
 		var localValid = true;
 		// var prepress = garLay.layers["Prepress"];
-		var prepress = findSpecificLayer(garLay.layers,"prepress","imatch");
+		var prepress = findSpecificLayer( garLay.layers, "prepress", "imatch" );
 
-		
-		for(var a=0;a<sorted.length;a++)
+
+		for ( var a = 0; a < sorted.length; a++ )
 		{
-			var thisArray = sorted[a];
-			var theSize = config.sizes[a]
+			var thisArray = sorted[ a ];
+			var theSize = config.sizes[ a ]
 			var newSizeLayer = prepress.layers.add();
 			newSizeLayer.name = theSize;
-			newSizeLayer.zOrder(ZOrderMethod.SENDTOBACK);
+			newSizeLayer.zOrder( ZOrderMethod.SENDTOBACK );
 			var thePieces = config.pieces;
-			
+
 			//this block for regular garments that follow "XL Front" type sizing structure
-			if(config["waist"] == undefined)
+			if ( config[ "waist" ] == undefined )
 			{
-				for(var b=0;b<thisArray.length;b++)
+				for ( var b = 0; b < thisArray.length; b++ )
 				{
-					var thisPieceName = thePieces[b];
-					if(thisPieceName == null)
+					var thisPieceName = thePieces[ b ];
+					if ( thisPieceName == null )
 					{
-						alert("Something's not grouped properly for the size: " + theSize);
+						alert( "Something's not grouped properly for the size: " + theSize );
 					}
-					var thisPiece = thisArray[b];
+					var thisPiece = thisArray[ b ];
 					thisPiece.name = theSize + " " + thisPieceName;
-					thisPiece.moveToBeginning(newSizeLayer);
+					thisPiece.moveToBeginning( newSizeLayer );
 
 				}
 			}
@@ -408,15 +410,15 @@ function container()
 			{
 				var waistCounter = 0;
 				var pieceCounter = 0;
-				for(var b=0;b<thisArray.length;b++)
+				for ( var b = 0; b < thisArray.length; b++ )
 				{
-					var thisPiece = thisArray[b];
-					var thisPieceName = config["pieces"][pieceCounter];
-					thisPiece.name = config["waist"][waistCounter] + "x" + theSize + " " + thisPieceName;
-					thisPiece.moveToBeginning(newSizeLayer);
+					var thisPiece = thisArray[ b ];
+					var thisPieceName = config[ "pieces" ][ pieceCounter ];
+					thisPiece.name = config[ "waist" ][ waistCounter ] + "x" + theSize + " " + thisPieceName;
+					thisPiece.moveToBeginning( newSizeLayer );
 
 					//increment or reset pieceCounter
-					if(pieceCounter < config["pieces"].length -1)
+					if ( pieceCounter < config[ "pieces" ].length - 1 )
 					{
 						pieceCounter++;
 					}
@@ -431,83 +433,83 @@ function container()
 		return localValid;
 	}
 
-	function moveThePieces(layers)
+	function moveThePieces ( layers )
 	{
 		var localValid = true;
 		var curLay;
 		var curSize;
-		for(var a=0;a<layers.length;a++)
+		for ( var a = 0; a < layers.length; a++ )
 		{
-			curLay = layers[a];
+			curLay = layers[ a ];
 			curSize = curLay.name;
 			var curPiece;
 			var coords;
-			for(var b=0;b<curLay.groupItems.length;b++)
+			for ( var b = 0; b < curLay.groupItems.length; b++ )
 			{
-				curPiece = curLay.groupItems[b];
-				coords = config.placement[curSize][curPiece.name];
-				
-				curPiece.left = coords[0];
-				curPiece.top = coords[1];
+				curPiece = curLay.groupItems[ b ];
+				coords = config.placement[ curSize ][ curPiece.name ];
+
+				curPiece.left = coords[ 0 ];
+				curPiece.top = coords[ 1 ];
 			}
 		}
 		return localValid;
 	}
 
-	function bringEdgesForward()
+	function bringEdgesForward ()
 	{
 		var edgeGroup = [];
 
-		for(var bef=0;bef<mockLay.pageItems.length;bef++)
+		for ( var bef = 0; bef < mockLay.pageItems.length; bef++ )
 		{
-			var thisItem = mockLay.pageItems[bef];
-			if(thisItem.name.toLowerCase().indexOf("edge") > -1)
+			var thisItem = mockLay.pageItems[ bef ];
+			if ( thisItem.name.toLowerCase().indexOf( "edge" ) > -1 )
 			{
-				edgeGroup.push(thisItem);
+				edgeGroup.push( thisItem );
 			}
 		}
 
-		if(edgeGroup.length > 0)
+		if ( edgeGroup.length > 0 )
 		{
-			for(var bef=0;bef<edgeGroup.length;bef++)
+			for ( var bef = 0; bef < edgeGroup.length; bef++ )
 			{
-				edgeGroup[bef].zOrder(ZOrderMethod.BRINGTOFRONT);
-				edgeGroup[bef].locked = true;
+				edgeGroup[ bef ].zOrder( ZOrderMethod.BRINGTOFRONT );
+				edgeGroup[ bef ].locked = true;
 			}
 		}
 	}
 
-	function createArtLayers()
+	function createArtLayers ()
 	{
 		var localValid = true;
 
 		//remove any existing artwork layers
-		while(artLay.layers.length)
+		while ( artLay.layers.length )
 		{
-			artLay.layers[0].remove();
+			artLay.layers[ 0 ].remove();
 		}
 
 		var reversed = config.artLayers.reverse();
 		var newLay;
-		for(var x=0,len=reversed.length;x<len;x++)
+		for ( var x = 0, len = reversed.length; x < len; x++ )
 		{
 			newLay = artLay.layers.add();
-			newLay.name = reversed[x];
+			newLay.name = reversed[ x ];
 		}
 		return localValid;
 	}
 
-	function cleanUp()
+	function cleanUp ()
 	{
 		var localValid = true;
-		var styleNum = prompt("Enter 4 digit style number", "1013");
+		var styleNum = prompt( "Enter 4 digit style number", "1013" );
 
-		var garmentCodeFrame = findSpecificPageItem(infoLay,"garment code","imatch");
-		var garmentCode2Frame = findSpecificPageItem(infoLay,"garment code 2","imatch");
-		
-		if(!garmentCodeFrame)
+		var garmentCodeFrame = findSpecificPageItem( infoLay, "garment code", "imatch" );
+		var garmentCode2Frame = findSpecificPageItem( infoLay, "garment code 2", "imatch" );
+
+		if ( !garmentCodeFrame )
 		{
-			errorList.push("Failed to find the \"Garment Code\" text on the info layer.");
+			errorList.push( "Failed to find the \"Garment Code\" text on the info layer." );
 		}
 		else
 		{
@@ -515,21 +517,21 @@ function container()
 		}
 
 		//check for existence of "Garment Code 2" textFrame. if true, repeat last line to add styleNum
-		if(garmentCode2Frame)
+		if ( garmentCode2Frame )
 		{
 			garmentCode2Frame.contents = config.garmentCode + "_" + styleNum;
 		}
 
-		layers["To Be Placed"].remove();
+		layers[ "To Be Placed" ].remove();
 		garLay.name = code + "_" + styleNum;
 		return localValid;
 	}
 
-	function clearOutPrepressLayer()
+	function clearOutPrepressLayer ()
 	{
-		while(ppLay.layers.length)
+		while ( ppLay.layers.length )
 		{
-			ppLay.layers[0].remove();
+			ppLay.layers[ 0 ].remove();
 		}
 	}
 
@@ -543,7 +545,7 @@ function container()
 	////Data Storage////
 	////////////////////
 
-	
+
 
 
 	////////End/////////
@@ -562,88 +564,88 @@ function container()
 	var errorList = [];
 
 	//important layer variables
-	var tbp,garLay,ppLay,infoLay,artLay,mockLay,srcLay;
+	var tbp, garLay, ppLay, infoLay, artLay, mockLay, srcLay;
 
-	var code = getCode(layers[1].name);
+	var code = getCode( layers[ 1 ].name );
 
 	//get the config data from the build template library
-	var config = readConfig(code);
+	var config = readConfig( code );
 
-	if(!config)
+	if ( !config )
 	{
 		valid = false;
 	}
 
-	if(valid)
+	if ( valid )
 	{
-		unlockDoc(docRef);	
+		unlockDoc( docRef );
 	}
 
-	if(valid)
+	if ( valid )
 	{
 		srcLay = getSrcLay();
 	}
 
-	if(valid)
+	if ( valid )
 	{
 		valid = setupLayers();
 	}
 
-	if(valid)
+	if ( valid )
 	{
 		clearOutPrepressLayer();
 	}
 
-	if(valid)
+	if ( valid )
 	{
-		var sorted = sortPieces(tbp.groupItems);
-		if(!sorted)
+		var sorted = sortPieces( tbp.groupItems );
+		if ( !sorted )
 		{
 			valid = false;
-			errorList.push("Something went wrong while sorting the pieces.");
+			errorList.push( "Something went wrong while sorting the pieces." );
 		}
 	}
 
-	if(valid)
+	if ( valid )
 	{
-		if(!nameThePieces(sorted))
+		if ( !nameThePieces( sorted ) )
 		{
 			valid = false;
-			errorList.push("Something went wrong while naming the pieces");
+			errorList.push( "Something went wrong while naming the pieces" );
 		}
 	}
 
-	if(valid)
+	if ( valid )
 	{
-		if(!moveThePieces(ppLay.layers))
+		if ( !moveThePieces( ppLay.layers ) )
 		{
 			valid = false;
-			errorList.push("Something went wrong while moving the pieces.");
+			errorList.push( "Something went wrong while moving the pieces." );
 		}
 	}
 
-	if(valid)
+	if ( valid )
 	{
-		if(!createArtLayers())
+		if ( !createArtLayers() )
 		{
 			valid = false;
-			errorList.push("Something went wrong while creating the artwork layers.");
+			errorList.push( "Something went wrong while creating the artwork layers." );
 		}
 	}
 
-	if(valid)
+	if ( valid )
 	{
 		bringEdgesForward();
 	}
 
-	if(valid)
+	if ( valid )
 	{
-		if(!cleanUp())
+		if ( !cleanUp() )
 		{
 			valid = false;
-			errorList.push("Something went wrong during cleanup.");
+			errorList.push( "Something went wrong during cleanup." );
 		}
-		properTemplateSetup(docRef);
+		properTemplateSetup( docRef );
 	}
 
 
@@ -654,9 +656,9 @@ function container()
 
 	/*****************************************************************************/
 
-	if(errorList.length>0)
+	if ( errorList.length > 0 )
 	{
-		sendErrors(errorList);
+		sendErrors( errorList );
 	}
 	return valid
 

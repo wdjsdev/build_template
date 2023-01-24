@@ -1,90 +1,92 @@
 
 #target Illustrator
-function initialRename()
+function initialRename ()
 {
 	var valid = true;
 	var scriptName = "initial_rename";
 
-	function getUtilities()
+	function getUtilities ()
 	{
-		var result = [];
-		var utilPath = "/Volumes/Customization/Library/Scripts/Script_Resources/Data/";
-		var ext = ".jsxbin"
-
-		//check for dev utilities preference file
-		var devUtilitiesPreferenceFile = File("~/Documents/script_preferences/dev_utilities.txt");
-
-		if(devUtilitiesPreferenceFile.exists)
+		var utilNames = [ "Utilities_Container" ]; //array of util names
+		var utilFiles = []; //array of util files
+		//check for dev mode
+		var devUtilitiesPreferenceFile = File( "~/Documents/script_preferences/dev_utilities.txt" );
+		function readDevPref ( dp ) { dp.open( "r" ); var contents = dp.read() || ""; dp.close(); return contents; }
+		if ( devUtilitiesPreferenceFile.exists && readDevPref( devUtilitiesPreferenceFile ).match( /true/i ) )
 		{
-			devUtilitiesPreferenceFile.open("r");
-			var prefContents = devUtilitiesPreferenceFile.read();
-			devUtilitiesPreferenceFile.close();
-			if(prefContents.match(/true/i))
+			$.writeln( "///////\n////////\nUsing dev utilities\n///////\n////////" );
+			var devUtilPath = "~/Desktop/automation/utilities/";
+			utilFiles = [ devUtilPath + "Utilities_Container.js", devUtilPath + "Batch_Framework.js" ];
+			return utilFiles;
+		}
+
+		var dataResourcePath = customizationPath + "Library/Scripts/Script_Resources/Data/";
+
+		for ( var u = 0; u < utilNames.length; u++ )
+		{
+			var utilFile = new File( dataResourcePath + utilNames[ u ] + ".jsxbin" );
+			if ( utilFile.exists )
 			{
-				utilPath = "~/Desktop/automation/utilities/";
-				ext = ".js";
+				utilFiles.push( utilFile );
 			}
+
 		}
 
-		if($.os.match("Windows"))
+		if ( !utilFiles.length )
 		{
-			utilPath = utilPath.replace("/Volumes/","//AD4/");
+			alert( "Could not find utilities. Please ensure you're connected to the appropriate Customization drive." );
+			return [];
 		}
 
-		result.push(utilPath + "Utilities_Container" + ext);
-		result.push(utilPath + "Batch_Framework" + ext);
 
-		if(!result.length)
-		{
-			valid = false;
-			alert("Failed to find the utilities.");
-		}
-		return result;
+		return utilFiles;
 
 	}
-
 	var utilities = getUtilities();
-	for(var u=0,len=utilities.length;u<len;u++)
+
+	for ( var u = 0, len = utilities.length; u < len && valid; u++ )
 	{
-		eval("#include \"" + utilities[u] + "\"");	
+		eval( "#include \"" + utilities[ u ] + "\"" );
 	}
 
-	if(!valid)return;
+	if ( !valid || !utilities.length ) return;
+
+	DEV_LOGGING = user === "will.dowling";
 
 
 	var docRef = app.activeDocument;
 	var layers = docRef.layers;
-	var srcLay,orientation;
+	var srcLay, orientation;
 
 	//logic container
-	function readConfig()
+	function readConfig ()
 	{
 		// var configFile = new File("~/Documents/build_template_config/btconfig.js");
-		var configFile = new File(documentsPath + "build_template_config/btconfig.js");
+		var configFile = new File( documentsPath + "build_template_config/btconfig.js" );
 
-		if(!configFile.exists)
+		if ( !configFile.exists )
 		{
-			alert("No Configuration file was found. Please run the configuration script first.");
+			alert( "No Configuration file was found. Please run the configuration script first." );
 			return false;
 		}
 
-		eval("#include \"" + configFile.fullName + "\"");
+		eval( "#include \"" + configFile.fullName + "\"" );
 
 		return config;
 	}
 
-	function getSrcLay()
+	function getSrcLay ()
 	{
 		try
 		{
-			return layers["To Be Placed"];
+			return layers[ "To Be Placed" ];
 
 		}
-		catch(e)
+		catch ( e )
 		{
-			alert("Sorry. You're missing the \"To Be Placed\" layer.\nYou need to copy the CAD to a layer called \"To Be Placed\"");
+			alert( "Sorry. You're missing the \"To Be Placed\" layer.\nYou need to copy the CAD to a layer called \"To Be Placed\"" );
 			return false;
-		}	
+		}
 	}
 
 	//sortPieces Function Description
@@ -93,20 +95,20 @@ function initialRename()
 	//Then sort each row from left to right
 	//groups = array of groups
 	//count = number of pieces per garment (ie. slowpitch would be 5. front, back, left sleeve, right sleeve, collar)
-	function sortPieces(groups)
+	function sortPieces ( groups )
 	{
 		var valid;
 		//create array of pieces
 		var pieces = [];
-		for(var x=0;x<groups.length;x++)
+		for ( var x = 0; x < groups.length; x++ )
 		{
-			var thisPiece = groups[x];
-			pieces.push(thisPiece);
+			var thisPiece = groups[ x ];
+			pieces.push( thisPiece );
 		}
 
-		if(pieces.length == 0)
+		if ( pieces.length == 0 )
 		{
-			alert("There's no art on the To Be Placed layer!");
+			alert( "There's no art on the To Be Placed layer!" );
 			return false;
 		}
 
@@ -115,7 +117,7 @@ function initialRename()
 		var sizeCount = config.sizes.length;
 		var pieceCount = config.pieces.length;
 
-		if(!config.waist)
+		if ( !config.waist )
 		{
 			var correctCount = sizeCount * pieceCount;
 		}
@@ -124,16 +126,16 @@ function initialRename()
 			var correctCount = sizeCount * config.waist.length * pieceCount;
 		}
 
-		if(pieces.length != correctCount)
+		if ( pieces.length != correctCount )
 		{
 			valid = false;
-			alert("There are " + pieces.length + " groups on the TBP layer.\nThere should be " + correctCount);
+			alert( "There are " + pieces.length + " groups on the TBP layer.\nThere should be " + correctCount );
 			return valid;
 		}
-		else if(srcLay.pathItems.length > 0 || srcLay.textFrames.length > 0 || srcLay.compoundPathItems.length > 0)
+		else if ( srcLay.pathItems.length > 0 || srcLay.textFrames.length > 0 || srcLay.compoundPathItems.length > 0 )
 		{
 			valid = false;
-			alert("Invalid items!\nTBP.pathItems.length = " + srcLay.pathItems.length + "\nTBP.textFrames.length = " + srcLay.textFrames.length + "\nTBP.compoundPathItems.length = " + srcLay.compoundPathItems.length);
+			alert( "Invalid items!\nTBP.pathItems.length = " + srcLay.pathItems.length + "\nTBP.textFrames.length = " + srcLay.textFrames.length + "\nTBP.compoundPathItems.length = " + srcLay.compoundPathItems.length );
 			return valid;
 		}
 
@@ -143,7 +145,7 @@ function initialRename()
 
 		var rowLength;
 		var rowLengthCopy;
-		if(config.waist)
+		if ( config.waist )
 		{
 			rowLength = rowLengthCopy = pieceCount * config.waist.length;
 		}
@@ -153,29 +155,29 @@ function initialRename()
 		}
 
 
-		if(config.orientation == "vertical")
+		if ( config.orientation == "vertical" )
 		{
 			//loop all the pieces to find the topmost piece
 			//push topMost to verticalSorted array
 			//splice topMost from pieces and repeat until pieces.length == 0
-			while(pieces.length>0)
+			while ( pieces.length > 0 )
 			{
 				var deleteIndex = 0;
-				var topMost = pieces[0];
+				var topMost = pieces[ 0 ];
 				var top = topMost.top;
 
-				for(var x = pieces.length - 1;x >0; x--)
+				for ( var x = pieces.length - 1; x > 0; x-- )
 				{
-					var thisPiece = pieces[x];
-					if(thisPiece.top >= top)
+					var thisPiece = pieces[ x ];
+					if ( thisPiece.top >= top )
 					{
 						topMost = thisPiece;
 						top = thisPiece.top;
 						deleteIndex = x;
 					}
 				}
-				verticalSorted.push(topMost);
-				pieces.splice(deleteIndex,1);
+				verticalSorted.push( topMost );
+				pieces.splice( deleteIndex, 1 );
 				rowLength--;
 
 			}
@@ -185,24 +187,24 @@ function initialRename()
 			//loop all the pieces to find the leftmost piece
 			//push leftMost to verticalSorted array
 			//splice leftMost from pieces and repeat until pieces.length == 0
-			while(pieces.length>0)
+			while ( pieces.length > 0 )
 			{
 				var deleteIndex = 0;
-				var leftMost = pieces[0];
+				var leftMost = pieces[ 0 ];
 				var left = leftMost.left;
 
-				for(var x = pieces.length-1;x >0; x--)
+				for ( var x = pieces.length - 1; x > 0; x-- )
 				{
-					var thisPiece = pieces[x];
-					if(thisPiece.left <= left)
+					var thisPiece = pieces[ x ];
+					if ( thisPiece.left <= left )
 					{
 						leftMost = thisPiece;
 						left = thisPiece.left;
 						deleteIndex = x;
 					}
 				}
-				verticalSorted.push(leftMost);
-				pieces.splice(deleteIndex,1);
+				verticalSorted.push( leftMost );
+				pieces.splice( deleteIndex, 1 );
 
 			}
 		}
@@ -214,101 +216,101 @@ function initialRename()
 		//this will all of pieces for a given size.
 		//for example, if there are 5 pieces necessary for a garment, it will pull the next 5 pieces from the verticalSorted array
 		//and push them into the temp array so they can be sorted from left to right.
-		for(var a=0;a<sizeCount;a++)
+		for ( var a = 0; a < sizeCount; a++ )
 		{
 			var temp = [];
-			var tempSorted =[];
-			
-			for(var b=0;b<rowLength;b++)
-			{
-				temp.push(verticalSorted[b]);
-			}
-			verticalSorted.splice(0,rowLength);
+			var tempSorted = [];
 
-			
-			while(temp.length>0)
+			for ( var b = 0; b < rowLength; b++ )
 			{
-				var leftMost = temp[0];
+				temp.push( verticalSorted[ b ] );
+			}
+			verticalSorted.splice( 0, rowLength );
+
+
+			while ( temp.length > 0 )
+			{
+				var leftMost = temp[ 0 ];
 				var left = leftMost.left;
-				var deleteIndex = 0; 
-				for(var b=0;b<temp.length;b++)
+				var deleteIndex = 0;
+				for ( var b = 0; b < temp.length; b++ )
 				{
-					var thisPiece = temp[b];
-					if(thisPiece.left <= left)
+					var thisPiece = temp[ b ];
+					if ( thisPiece.left <= left )
 					{
 						leftMost = thisPiece;
 						left = thisPiece.left;
 						deleteIndex = b;
 					}
 				}
-				tempSorted.push(leftMost);
-				temp.splice(deleteIndex,1);
+				tempSorted.push( leftMost );
+				temp.splice( deleteIndex, 1 );
 			}
 
-			finalSorted.push(sortVert(tempSorted));
-				
+			finalSorted.push( sortVert( tempSorted ) );
+
 		}
-		
+
 
 
 		return finalSorted;
 	}
 
-	function sortVert(thisRow)
+	function sortVert ( thisRow )
 	{
 		var finishedSorting = [];
-		var sortVertBuffer =10;
+		var sortVertBuffer = 10;
 
-		if(thisRow.length==1)
+		if ( thisRow.length == 1 )
 		{
-			finishedSorting.push(thisRow[0]);
+			finishedSorting.push( thisRow[ 0 ] );
 			return finishedSorting;
 		}
-		while(thisRow.length>0)
+		while ( thisRow.length > 0 )
 		{
 			var sharedLefts = [];
 			var shared = false;
-			var curLeft = thisRow[0].left;
-			for(var a=thisRow.length-1;a>0;a--)
+			var curLeft = thisRow[ 0 ].left;
+			for ( var a = thisRow.length - 1; a > 0; a-- )
 			{
-				var thisGroup = thisRow[a];
+				var thisGroup = thisRow[ a ];
 
-				if(thisGroup.left + sortVertBuffer > curLeft && thisGroup.left - sortVertBuffer < curLeft)
+				if ( thisGroup.left + sortVertBuffer > curLeft && thisGroup.left - sortVertBuffer < curLeft )
 				{
 					//this group and thisRow[0] share a left coordinate
-					sharedLefts.push(thisGroup)
+					sharedLefts.push( thisGroup )
 					shared = true;
-					thisRow.splice(a,1);
+					thisRow.splice( a, 1 );
 				}
 			}
-			
-			if(!shared)
+
+			if ( !shared )
 			{
-				finishedSorting.push(thisRow[0])
-				thisRow.splice(0,1);
+				finishedSorting.push( thisRow[ 0 ] )
+				thisRow.splice( 0, 1 );
 			}
 			else
 			{
-				sharedLefts.push(thisRow[0]);
-				thisRow.splice(0,1);
+				sharedLefts.push( thisRow[ 0 ] );
+				thisRow.splice( 0, 1 );
 
-				while(sharedLefts.length>0)
+				while ( sharedLefts.length > 0 )
 				{
-					var top = sharedLefts[0].top;
-					var topMost = sharedLefts[0];
+					var top = sharedLefts[ 0 ].top;
+					var topMost = sharedLefts[ 0 ];
 					var di = 0;
-					for(var t = 1;t <sharedLefts.length; t++)
+					for ( var t = 1; t < sharedLefts.length; t++ )
 					{
-						var thisGroup = sharedLefts[t];
-						if(thisGroup.top > top)
+						var thisGroup = sharedLefts[ t ];
+						if ( thisGroup.top > top )
 						{
 							top = thisGroup.top;
 							topMost = thisGroup;
 							di = t;
 						}
 					}
-					finishedSorting.push(topMost);
-					sharedLefts.splice(di,1);
+					finishedSorting.push( topMost );
+					sharedLefts.splice( di, 1 );
 				}
 
 			}
@@ -317,13 +319,13 @@ function initialRename()
 		return finishedSorting;
 	}
 
-	function nameThePieces(sorted)
+	function nameThePieces ( sorted )
 	{
-		var garLay = layers[1];
+		var garLay = layers[ 1 ];
 		garLay.locked = false;
 		garLay.visible = true;
-		var prepress = findSpecificLayer(garLay,"Prepress");
-		if(!prepress)
+		var prepress = findSpecificLayer( garLay, "Prepress" );
+		if ( !prepress )
 		{
 			prepress = garLay.layers.add();
 			prepress.name = "Prepress";
@@ -334,33 +336,33 @@ function initialRename()
 		//delete any layers that exist on the prepress layer
 		//to avoid having duplicated size layers if the blank
 		//template file had empty size layers in the prepress layer
-		for(var dppl = prepress.layers.length - 1; dppl>=0; dppl--)
+		for ( var dppl = prepress.layers.length - 1; dppl >= 0; dppl-- )
 		{
-			prepress.layers[dppl].remove();
+			prepress.layers[ dppl ].remove();
 		}
-		
-		for(var a=0;a<sorted.length;a++)
+
+		for ( var a = 0; a < sorted.length; a++ )
 		{
-			var thisArray = sorted[a];
-			var theSize = config.sizes[a]
+			var thisArray = sorted[ a ];
+			var theSize = config.sizes[ a ]
 			var newSizeLayer = prepress.layers.add();
 			newSizeLayer.name = theSize;
-			newSizeLayer.zOrder(ZOrderMethod.SENDTOBACK);
+			newSizeLayer.zOrder( ZOrderMethod.SENDTOBACK );
 			var thePieces = config.pieces;
-			
+
 			//this block for regular garments that follow "XL Front" type sizing structure
-			if(config["waist"] == undefined)
+			if ( config[ "waist" ] == undefined )
 			{
-				for(var b=0;b<thisArray.length;b++)
+				for ( var b = 0; b < thisArray.length; b++ )
 				{
-					var thisPieceName = thePieces[b];
-					if(thisPieceName == null)
+					var thisPieceName = thePieces[ b ];
+					if ( thisPieceName == null )
 					{
-						alert("Something's not grouped properly for the size: " + theSize);
+						alert( "Something's not grouped properly for the size: " + theSize );
 					}
-					var thisPiece = thisArray[b];
+					var thisPiece = thisArray[ b ];
 					thisPiece.name = theSize + " " + thisPieceName;
-					thisPiece.moveToBeginning(newSizeLayer);
+					thisPiece.moveToBeginning( newSizeLayer );
 
 				}
 			}
@@ -370,19 +372,19 @@ function initialRename()
 			{
 				var waistCounter = 0;
 				var pieceCounter = 0;
-				for(var b=0;b<thisArray.length;b++)
+				for ( var b = 0; b < thisArray.length; b++ )
 				{
-					var thisPiece = thisArray[b];
-					var thisPieceName = config["pieces"][pieceCounter];
-					thisPiece.name = config["waist"][waistCounter] + "x" + theSize + " " + thisPieceName;
-					thisPiece.moveToBeginning(newSizeLayer);
+					var thisPiece = thisArray[ b ];
+					var thisPieceName = config[ "pieces" ][ pieceCounter ];
+					thisPiece.name = config[ "waist" ][ waistCounter ] + "x" + theSize + " " + thisPieceName;
+					thisPiece.moveToBeginning( newSizeLayer );
 
 					//increment or reset pieceCounter
 					// if(pieceCounter < 7)
 					// {
 					// 	pieceCounter++;
 					// }
-					if(pieceCounter < config["pieces"].length -1)
+					if ( pieceCounter < config[ "pieces" ].length - 1 )
 					{
 						pieceCounter++;
 					}
@@ -397,31 +399,31 @@ function initialRename()
 	}
 
 	//begin function calls
-	if(valid)
+	if ( valid )
 	{
 		var config = readConfig();
-		if(!config)
+		if ( !config )
 		{
 			valid = false;
 		}
 	}
-	
-	if(valid)
+
+	if ( valid )
 	{
 		var srcLay = getSrcLay();
-		if(!srcLay)
+		if ( !srcLay )
 		{
 			valid = false;
 		}
 	}
 
-	if(valid)
+	if ( valid )
 	{
-		var sorted = sortPieces(srcLay.groupItems);
-		nameThePieces(sorted);
+		var sorted = sortPieces( srcLay.groupItems );
+		nameThePieces( sorted );
 	}
 
-	
-	
+
+
 }
 initialRename();
